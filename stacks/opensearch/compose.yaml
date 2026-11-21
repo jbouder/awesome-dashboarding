@@ -1,0 +1,73 @@
+# OpenSearch Dashboards: logs and search analytics, the open Kibana fork.
+# http://localhost:5601, no sign-in. OpenSearch's API: http://localhost:9200.
+# The security plugin is off. This is a local lab, never a deployment.
+services:
+  opensearch:
+    image: opensearchproject/opensearch:3.10.0
+    profiles: ["opensearch"]
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "127.0.0.1:${OPENSEARCH_PORT:-9200}:9200"
+    volumes:
+      - opensearch:/usr/share/opensearch/data
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s'"]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 20s
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:3.10.0
+    profiles: ["opensearch"]
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    ports:
+      - "127.0.0.1:${OPENSEARCH_DASHBOARDS_PORT:-5601}:5601"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5601/api/status | grep -q green"]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 30s
+
+  # Turns the live service metrics into access logs.
+  opensearch-logs:
+    image: dashlab-seed:local
+    profiles: ["opensearch"]
+    command: ["python", "/lab/logs.py"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+      OPENSEARCH_URL: http://opensearch:9200
+    volumes:
+      - ./logs.py:/lab/logs.py:ro
+    restart: unless-stopped
+    depends_on:
+      opensearch:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+
+  opensearch-bootstrap:
+    image: dashlab-seed:local
+    profiles: ["opensearch"]
+    command: ["python", "/lab/bootstrap.py"]
+    volumes:
+      - ./bootstrap.py:/lab/bootstrap.py:ro
+    depends_on:
+      opensearch-dashboards:
+        condition: service_healthy
+
+volumes:
+  opensearch:

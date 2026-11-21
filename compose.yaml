@@ -13,3 +13,7 @@ include:
   - stacks/marimo/compose.yaml
   - stacks/cube/compose.yaml
   - stacks/rill/compose.yaml
+  - stacks/clickhouse/compose.yaml
+  - stacks/opensearch/compose.yaml
+  - stacks/evidence/compose.yaml
+  - stacks/lightdash/compose.yaml

@@ -80,7 +80,7 @@ write and easy to review.
 
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
-| [Evidence](https://github.com/evidence-dev/evidence) | MIT | Polished reports as code, versioned in Git | Plain Markdown and SQL, easy for AI to write | TBD |
+| [Evidence](https://github.com/evidence-dev/evidence) | MIT | Polished reports as code, versioned in Git | Plain Markdown and SQL, easy for AI to write | [`evidence`](stacks/evidence/) |
 | [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | KPI dashboards with row-level security in the free build | MCP server | [`superset`](stacks/superset/) |
 | [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Self-service for non-technical users | Metabot natural-language questions | [`metabase`](stacks/metabase/) |
 | [Observable Framework](https://github.com/observablehq/framework) | ISC | Fast static data apps and reports | Code-first, easy for AI to write | TBD |
@@ -99,7 +99,7 @@ frameworks belong here too when the analysis needs code.
 | --- | --- | --- | --- | --- |
 | [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | Drill-down, SQL Lab, embedding with no license obligations | MCP server | [`superset`](stacks/superset/) |
 | [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Point-and-click question builder | Metabot natural-language questions | [`metabase`](stacks/metabase/) |
-| [Lightdash](https://github.com/lightdash/lightdash) | MIT | BI on top of dbt models | dbt metrics give agents a semantic layer | TBD |
+| [Lightdash](https://github.com/lightdash/lightdash) | MIT | BI on top of dbt models | dbt metrics give agents a semantic layer | [`lightdash`](stacks/lightdash/) |
 | [Cube](https://github.com/cube-js/cube) | Apache 2.0 | Headless semantic layer with SQL, REST, and GraphQL APIs | Grounds any agent in governed metrics | [`cube`](stacks/cube/) |
 | [Streamlit](https://github.com/streamlit/streamlit) | Apache 2.0 | Python data apps | The most common target for AI-written apps | [`streamlit`](stacks/streamlit/) |
 | [Plotly Dash](https://github.com/plotly/dash) | MIT | Python data apps with fine-grained callbacks | Plain Python, easy for AI to write | TBD |
@@ -118,9 +118,9 @@ covers most needs with no license fee.
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
 | [Grafana](https://github.com/grafana/grafana) | AGPL-3.0 | Live panels and alerting | MCP server ([mcp-grafana](https://github.com/grafana/mcp-grafana)) | [`grafana`](stacks/grafana/) |
-| [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | Apache 2.0 | Logs and search analytics, the open Kibana fork | Chat assistant plugin ([dashboards-assistant](https://github.com/opensearch-project/dashboards-assistant)) | TBD |
+| [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | Apache 2.0 | Logs and search analytics, the open Kibana fork | Chat assistant plugin ([dashboards-assistant](https://github.com/opensearch-project/dashboards-assistant)) | [`opensearch`](stacks/opensearch/) |
 | [Rill](https://github.com/rilldata/rill) | Apache 2.0 | Fast metrics explorer on DuckDB or ClickHouse | Metrics defined as code, easy for AI to write | [`rill`](stacks/rill/) |
-| [ClickHouse](https://github.com/ClickHouse/ClickHouse) | Apache 2.0 | Real-time OLAP engine | MCP server ([mcp-clickhouse](https://github.com/ClickHouse/mcp-clickhouse)) | TBD |
+| [ClickHouse](https://github.com/ClickHouse/ClickHouse) | Apache 2.0 | Real-time OLAP engine | MCP server ([mcp-clickhouse](https://github.com/ClickHouse/mcp-clickhouse)) | [`clickhouse`](stacks/clickhouse/) |
 | [Apache Druid](https://github.com/apache/druid) / [Apache Pinot](https://github.com/apache/pinot) | Apache 2.0 | Real-time OLAP at high ingest rates | Engine only | TBD |
 | [InfluxDB](https://github.com/influxdata/influxdb) | MIT / Apache 2.0 | Purpose-built time-series database | Engine only | TBD |
 
@@ -208,8 +208,10 @@ Open source covers three types well. Generative is the youngest.
 ## Run them locally
 
 You need Docker with Compose v2 and `make`. Running every stack at once takes
-about 5 GB of memory for Docker. The first start downloads the images, which
-takes a few minutes. After that, `make up all` is ready in under a minute.
+about 8 GB of memory for Docker. A few at a time need much less. The first
+start downloads every image, about 40 GB on disk, which takes a while.
+`make up superset` downloads only what Superset needs. After that,
+`make up all` is ready in about two and a half minutes, most of it Lightdash.
 
 ```sh
 git clone https://github.com/jbouder/awesome-dashboarding.git
@@ -239,7 +241,11 @@ Run `make help` for every command. The ones you will use most:
 | --- | --- | --- | --- | --- |
 | Superset | Strategic, analytical | <http://localhost:8088> | `admin` / `admin` | [stacks/superset](stacks/superset/) |
 | Metabase | Strategic, analytical | <http://localhost:3002> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/metabase](stacks/metabase/) |
+| Lightdash | Analytical | <http://localhost:8080> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/lightdash](stacks/lightdash/) |
+| Evidence | Strategic | <http://localhost:3005> | `lab` / `lab` | [stacks/evidence](stacks/evidence/) |
 | Grafana | Operational | <http://localhost:3001> | None to view, `admin` / `admin` to edit | [stacks/grafana](stacks/grafana/) |
+| ClickHouse | Operational engine | <http://localhost:8123/play> | `lab` / `lab` | [stacks/clickhouse](stacks/clickhouse/) |
+| OpenSearch Dashboards | Operational, logs | <http://localhost:5601> | None | [stacks/opensearch](stacks/opensearch/) |
 | Rill | Analytical, operational | <http://localhost:9009> | None | [stacks/rill](stacks/rill/) |
 | Holotable | Generative | <http://localhost:3000> | None | [stacks/holotable](stacks/holotable/) |
 | Cube | Semantic layer | <http://localhost:4000> | None | [stacks/cube](stacks/cube/) |
@@ -259,8 +265,8 @@ nothing is reachable from your network. Do not reuse them elsewhere.
   stream ───▶ │ ops.*      live service metrics every 5 s, and incidents                │
               └──────────────────────────────────▲───────────────────────────────────┘
                                                  │                        all read-only
-                Superset, Metabase, Grafana, Rill, Holotable, Cube,     as lab_ro
-                Streamlit, marimo
+      Superset, Metabase, Lightdash, Evidence, Grafana, ClickHouse,   as lab_ro
+      OpenSearch (logs), Rill, Holotable, Cube, Streamlit, marimo
 ```
 
 - `core/` is the shared data layer. It always starts.
@@ -311,10 +317,8 @@ agree.
 2. **Local lab.** Shared warehouse, seed data, live metrics, and stacks for
    Superset, Metabase, Grafana, Rill, Holotable, Cube, Streamlit, and marimo,
    plus a WrenAI guide. Done.
-3. **More stacks.** One more round of high-profile tools. Everything else
-   marked *TBD* waits on demand. Evidence is waiting on its new CLI: the
-   `npm`-based workflow is deprecated, and the lab has not yet confirmed the
-   new one runs with no account.
+3. **High-profile stacks.** Lightdash, Evidence, ClickHouse, and OpenSearch
+   Dashboards. Done. Everything still marked *TBD* waits on demand.
 4. **Comparison scripts.** One set of questions run against each tool, with
    the answers collected side by side.
 

@@ -1,0 +1,15 @@
+# A dbt project that points Lightdash at the warehouse's semantic layer.
+# The models are never run: each one names an existing view in schema
+# `metrics`, and Lightdash only compiles the project to read its metadata.
+name: lumen_supply
+version: "1.0.0"
+config-version: 2
+profile: lumen_supply
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+
+models:
+  lumen_supply:
+    +materialized: view
+    +schema: metrics

@@ -1,0 +1,15 @@
+# Used by the "Service health (ClickHouse)" dashboard. Works when the
+# clickhouse stack is running too: make up grafana clickhouse
+apiVersion: 1
+datasources:
+  - name: Lab ClickHouse
+    uid: lab-clickhouse
+    type: grafana-clickhouse-datasource
+    jsonData:
+      host: clickhouse
+      port: 8123
+      protocol: http
+      username: lab
+      defaultDatabase: lumen
+    secureJsonData:
+      password: lab

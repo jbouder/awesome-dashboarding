@@ -26,13 +26,16 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-STACKS="superset metabase grafana rill holotable cube streamlit marimo"
+STACKS="superset metabase lightdash evidence grafana clickhouse opensearch rill holotable cube streamlit marimo"
 
 # Per stack: type, URL, sign-in, license, long-running services, one-shot jobs.
 stack_type() {
   case $1 in
     superset|metabase) echo "Strategic, analytical";;
-    grafana) echo "Operational";;
+    lightdash) echo "Analytical";;
+    evidence) echo "Strategic";;
+    grafana|opensearch) echo "Operational";;
+    clickhouse) echo "Operational engine";;
     rill) echo "Analytical, operational";;
     holotable) echo "Generative";;
     cube) echo "Semantic layer";;
@@ -43,6 +46,10 @@ stack_url() {
   case $1 in
     superset) echo "http://localhost:${SUPERSET_PORT:-8088}";;
     metabase) echo "http://localhost:${METABASE_PORT:-3002}";;
+    lightdash) echo "http://localhost:${LIGHTDASH_PORT:-8080}";;
+    evidence) echo "http://localhost:${EVIDENCE_PORT:-3005}";;
+    clickhouse) echo "http://localhost:${CLICKHOUSE_PORT:-8123}/play";;
+    opensearch) echo "http://localhost:${OPENSEARCH_DASHBOARDS_PORT:-5601}";;
     grafana) echo "http://localhost:${GRAFANA_PORT:-3001}";;
     rill) echo "http://localhost:${RILL_PORT:-9009}";;
     holotable) echo "http://localhost:${HOLOTABLE_PORT:-3000}";;
@@ -54,7 +61,8 @@ stack_url() {
 stack_login() {
   case $1 in
     superset) echo "admin / admin";;
-    metabase) echo "admin@dashlab.local / dashlab-admin-1";;
+    metabase|lightdash) echo "admin@dashlab.local / dashlab-admin-1";;
+    evidence|clickhouse) echo "lab / lab";;
     grafana) echo "none to view, admin / admin to edit";;
     holotable) echo "none (local owner)";;
     cube) echo "none (dev mode)";;
@@ -64,12 +72,16 @@ stack_login() {
 stack_license() {
   case $1 in
     grafana|metabase) echo "AGPL-3.0";;
-    streamlit|holotable|cube|rill|marimo|superset) echo "Apache 2.0";;
+    lightdash|evidence) echo "MIT";;
+    *) echo "Apache 2.0";;
   esac
 }
 stack_services() {
   case $1 in
     superset) echo "superset superset-mcp";;
+    clickhouse) echo "clickhouse clickhouse-mcp";;
+    opensearch) echo "opensearch-dashboards opensearch opensearch-logs";;
+    lightdash) echo "lightdash lightdash-db lightdash-minio";;
     *) echo "$1";;
   esac
 }
@@ -78,6 +90,8 @@ stack_jobs() {
     superset) echo "superset-init superset-bootstrap";;
     holotable) echo "holotable-register";;
     metabase) echo "metabase-bootstrap";;
+    opensearch) echo "opensearch-bootstrap";;
+    lightdash) echo "lightdash-bootstrap";;
     *) echo "";;
   esac
 }
@@ -97,9 +111,9 @@ die() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 known() { case " $STACKS " in *" $1 "*) return 0;; *) return 1;; esac; }
 
 cmd_list() {
-  printf '%-10s %-24s %-24s %-11s %s\n' STACK TYPE URL LICENSE SIGN-IN
+  printf '%-10s %-24s %-30s %-11s %s\n' STACK TYPE URL LICENSE SIGN-IN
   for s in $STACKS; do
-    printf '%-10s %-24s %-24s %-11s %s\n' "$s" "$(stack_type "$s")" "$(stack_url "$s")" "$(stack_license "$s")" "$(stack_login "$s")"
+    printf '%-10s %-24s %-30s %-11s %s\n' "$s" "$(stack_type "$s")" "$(stack_url "$s")" "$(stack_license "$s")" "$(stack_login "$s")"
   done
   echo
   echo "Guide only, no container: wrenai (see stacks/wrenai/README.md)"
@@ -150,7 +164,7 @@ stacks_from() {
   echo $out
 }
 
-stack_port() { stack_url "$1" | sed 's/.*://'; }
+stack_port() { stack_url "$1" | sed 's#.*:\([0-9]*\).*#\1#'; }
 
 cmd_doctor() {
   local ok=1 v mem s port pid
@@ -163,16 +177,18 @@ cmd_doctor() {
       *) echo "  PASS  Compose $v";; esac
   else echo "  FAIL  docker compose is missing. Install Compose v2."; ok=0; fi
   mem=$(docker info --format '{{.MemTotal}}' 2>/dev/null || echo 0)
-  if [ "${mem:-0}" -ge 4000000000 ] 2>/dev/null; then echo "  PASS  Docker memory $((mem / 1073741824)) GB"
-  else echo "  WARN  Docker has $((${mem:-0} / 1073741824)) GB of memory. All stacks together need about 4 GB."; fi
+  if [ "${mem:-0}" -ge 8000000000 ] 2>/dev/null; then echo "  PASS  Docker memory $((mem / 1073741824)) GB"
+  else echo "  WARN  Docker has $((${mem:-0} / 1073741824)) GB of memory. Every stack at once needs about 8 GB; a few at a time need less."; fi
   for t in make curl python3; do
     if command -v "$t" >/dev/null; then echo "  PASS  $t"; else echo "  WARN  $t not found. make smoke and make open need it."; fi
   done
-  for s in $STACKS warehouse superset-mcp cube-sql; do
+  for s in $STACKS warehouse superset-mcp cube-sql clickhouse-mcp opensearch-api; do
     case $s in
       warehouse) port=${WAREHOUSE_PORT:-5433};;
       superset-mcp) port=${SUPERSET_MCP_PORT:-5008};;
       cube-sql) port=${CUBE_SQL_PORT:-15432};;
+      clickhouse-mcp) port=${CLICKHOUSE_MCP_PORT:-5009};;
+      opensearch-api) port=${OPENSEARCH_PORT:-9200};;
       *) port=$(stack_port "$s");;
     esac
     pid=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null | head -1 || true)
@@ -200,7 +216,8 @@ cmd_pull() {
   for s in $list; do
     profiles="$profiles --profile $s"
     case $s in
-      streamlit|marimo|rill) builds="$builds $s";;  # built locally
+      streamlit|marimo|rill|evidence) builds="$builds $s";;  # built locally
+      clickhouse) builds="$builds clickhouse-mcp"; services="$services clickhouse";;
       *) services="$services $(stack_services "$s")";;
     esac
   done

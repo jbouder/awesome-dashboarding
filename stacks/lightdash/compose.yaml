@@ -1,0 +1,99 @@
+# Lightdash: BI on top of dbt models.
+# http://localhost:8080, admin@dashlab.local / dashlab-admin-1
+# Lightdash publishes an amd64 image only. On Apple Silicon, Docker runs it
+# under emulation: it works, it starts slower.
+services:
+  lightdash-db:
+    image: pgvector/pgvector:pg17
+    profiles: ["lightdash"]
+    environment:
+      POSTGRES_USER: lightdash
+      POSTGRES_PASSWORD: lightdash
+      POSTGRES_DB: lightdash
+    volumes:
+      - lightdash-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lightdash -d lightdash"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  # S3-compatible storage, which Lightdash requires for results and exports.
+  lightdash-minio:
+    image: coollabsio/minio:RELEASE.2025-10-15T17-29-55Z
+    profiles: ["lightdash"]
+    entrypoint: ["/bin/sh", "/init-minio.sh"]
+    environment:
+      MINIO_ROOT_USER: lightdash
+      MINIO_ROOT_PASSWORD: lightdash-local-only
+    volumes:
+      - ./init-minio.sh:/init-minio.sh:ro
+      - lightdash-minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ls", "local/lightdash"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+
+  lightdash:
+    image: lightdash/lightdash:3.359.1
+    platform: linux/amd64
+    profiles: ["lightdash"]
+    environment:
+      PGHOST: lightdash-db
+      PGPORT: "5432"
+      PGUSER: lightdash
+      PGPASSWORD: lightdash
+      PGDATABASE: lightdash
+      LIGHTDASH_SECRET: ${LIGHTDASH_SECRET:-dashlab-local-only-lightdash-secret}
+      SITE_URL: http://localhost:${LIGHTDASH_PORT:-8080}
+      PORT: "8080"
+      SECURE_COOKIES: "false"
+      TRUST_PROXY: "false"
+      LIGHTDASH_INSTALL_TYPE: docker_image
+      LIGHTDASH_LOG_LEVEL: warn
+      # No usage analytics from the lab.
+      RUDDERSTACK_ANALYTICS_DISABLED: "true"
+      S3_ENDPOINT: http://lightdash-minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: lightdash
+      S3_ACCESS_KEY: lightdash
+      S3_SECRET_KEY: lightdash-local-only
+      S3_FORCE_PATH_STYLE: "true"
+      # The dbt project. Lightdash compiles it and never runs it; dbt writes
+      # target/, logs/, and dbt_packages/ here, which git ignores.
+      DBT_PROJECT_DIR: /usr/app/dbt
+    volumes:
+      - ./dbt:/usr/app/dbt
+    ports:
+      - "127.0.0.1:${LIGHTDASH_PORT:-8080}:8080"
+    depends_on:
+      lightdash-db:
+        condition: service_healthy
+      lightdash-minio:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/api/v1/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 10s
+      timeout: 10s
+      retries: 60
+      start_period: 60s
+
+  lightdash-bootstrap:
+    image: dashlab-seed:local
+    profiles: ["lightdash"]
+    command: ["python", "/lab/bootstrap.py"]
+    environment:
+      LIGHTDASH_ADMIN_EMAIL: admin@dashlab.local
+      LIGHTDASH_ADMIN_PASSWORD: ${LIGHTDASH_ADMIN_PASSWORD:-dashlab-admin-1}
+    volumes:
+      - ./bootstrap.py:/lab/bootstrap.py:ro
+    depends_on:
+      lightdash:
+        condition: service_healthy
+
+volumes:
+  lightdash-db:
+  lightdash-minio:

@@ -24,6 +24,12 @@ import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PORTS = {
+    "clickhouse": os.environ.get("CLICKHOUSE_PORT", "8123"),
+    "clickhouse-mcp": os.environ.get("CLICKHOUSE_MCP_PORT", "5009"),
+    "opensearch": os.environ.get("OPENSEARCH_PORT", "9200"),
+    "opensearch-dashboards": os.environ.get("OPENSEARCH_DASHBOARDS_PORT", "5601"),
+    "evidence": os.environ.get("EVIDENCE_PORT", "3005"),
+    "lightdash": os.environ.get("LIGHTDASH_PORT", "8080"),
     "cube": os.environ.get("CUBE_PORT", "4000"),
     "rill": os.environ.get("RILL_PORT", "9009"),
     "streamlit": os.environ.get("STREAMLIT_PORT", "3003"),
@@ -274,6 +280,97 @@ def main() -> int:
                 "project loaded",
                 f"{len(resources)} resources" if not errors else f"errors in {', '.join(errors)}",
             )
+
+    print("ClickHouse")
+    if not running("clickhouse"):
+        report("SKIP", "clickhouse", "not running")
+    else:
+
+        @check("clickhouse")
+        def _clickhouse() -> None:
+            c = Client(f"http://localhost:{PORTS['clickhouse']}")
+            password = os.environ.get("CLICKHOUSE_PASSWORD", "lab")
+            c.headers["Authorization"] = "Basic " + base64.b64encode(f"lab:{password}".encode()).decode()
+            sql = (
+                "SELECT sum(revenue) FROM lumen.sales WHERE ordered_at >= toStartOfQuarter(now()) - INTERVAL 3 MONTH "
+                "AND ordered_at < toStartOfQuarter(now())"
+            )
+            got = float(c.call("POST", "/?query=" + urllib.parse.quote(sql), raw=True).decode().strip())
+            # lumen.sales is line-level, rounded per line. The KPI view rounds per order.
+            report(
+                "PASS" if abs(got - float(expected)) < 5 else "FAIL",
+                "revenue matches the warehouse",
+                f"${got:,.2f}, off by ${abs(got - float(expected)):.2f} from rounding",
+            )
+            lag = (
+                c.call(
+                    "POST",
+                    "/?query="
+                    + urllib.parse.quote(
+                        "SELECT dateDiff('second', max(ts), now()) FROM lumen.request_metrics"
+                    ),
+                    raw=True,
+                )
+                .decode()
+                .strip()
+            )
+            report("PASS" if int(lag) <= 40 else "FAIL", "live metrics synced", f"newest row {lag}s old")
+            if running("clickhouse-mcp"):
+                Client(f"http://localhost:{PORTS['clickhouse-mcp']}").call("GET", "/health", raw=True)
+                report("PASS", "MCP server")
+
+    print("OpenSearch")
+    if not running("opensearch"):
+        report("SKIP", "opensearch", "not running")
+    else:
+
+        @check("opensearch")
+        def _opensearch() -> None:
+            c = Client(f"http://localhost:{PORTS['opensearch']}")
+            recent = c.call(
+                "POST", "/lumen-logs-*/_count", {"query": {"range": {"@timestamp": {"gte": "now-1m"}}}}
+            )["count"]
+            report("PASS" if recent > 0 else "FAIL", "logs flowing", f"{recent:,} lines in the last minute")
+            d = Client(f"http://localhost:{PORTS['opensearch-dashboards']}")
+            d.call("GET", "/api/saved_objects/dashboard/lumen-service-logs")
+            report("PASS", "dashboard Lumen Supply service logs")
+
+    print("Evidence")
+    if not running("evidence"):
+        report("SKIP", "evidence", "not running")
+    else:
+
+        @check("evidence")
+        def _evidence() -> None:
+            c = Client(f"http://localhost:{PORTS['evidence']}")
+            password = os.environ.get("EVIDENCE_PASSWORD", "lab")
+            c.headers["Authorization"] = "Basic " + base64.b64encode(f"lab:{password}".encode()).decode()
+            page = c.call("GET", "/", raw=True).decode()
+            ok = "Lumen Supply: quarterly report" in page
+            report("PASS" if ok else "FAIL", "report page served")
+
+    print("Lightdash")
+    if not running("lightdash"):
+        report("SKIP", "lightdash", "not running")
+    else:
+
+        @check("lightdash")
+        def _lightdash() -> None:
+            c = Client(f"http://localhost:{PORTS['lightdash']}")
+            c.call(
+                "POST",
+                "/api/v1/login",
+                {
+                    "email": "admin@dashlab.local",
+                    "password": os.environ.get("LIGHTDASH_ADMIN_PASSWORD", "dashlab-admin-1"),
+                },
+            )
+            project = next(
+                p for p in c.call("GET", "/api/v1/org/projects")["results"] if p["name"] == "Lumen Supply"
+            )
+            explores = c.call("GET", f"/api/v1/projects/{project['projectUuid']}/explores")["results"]
+            good = [e["name"] for e in explores if not e.get("errors")]
+            report("PASS" if len(good) >= 3 else "FAIL", "dbt project compiled", ", ".join(sorted(good)))
 
     for name, path in (("streamlit", "/_stcore/health"), ("marimo", "/health")):
         print(name.capitalize())

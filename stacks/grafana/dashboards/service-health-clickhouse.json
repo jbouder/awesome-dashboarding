@@ -1,0 +1,216 @@
+{
+  "uid": "lab-clickhouse",
+  "title": "Service health (ClickHouse)",
+  "tags": [
+    "lab",
+    "clickhouse"
+  ],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "schemaVersion": 39,
+  "editable": true,
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "About",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 3
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "The same live service metrics as **Service health**, but queried from **ClickHouse** instead of Postgres. ClickHouse copies them from the warehouse every 10 seconds. Needs `make up grafana clickhouse`. The bottom row reads two years of order lines from ClickHouse's columnar storage."
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Error rate by service",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "lab-clickhouse"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "lab-clickhouse"
+          },
+          "editorType": "sql",
+          "rawSql": "SELECT $__timeInterval(ts) AS time, service, sum(errors) / sum(requests) AS error_rate\nFROM lumen.request_metrics WHERE $__timeFilter(ts)\nGROUP BY time, service ORDER BY time",
+          "format": 0,
+          "pluginVersion": "4.23.5"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "p95 latency by service",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "lab-clickhouse"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 3,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "lab-clickhouse"
+          },
+          "editorType": "sql",
+          "rawSql": "SELECT $__timeInterval(ts) AS time, service, max(p95_latency_ms) AS p95\nFROM lumen.request_metrics WHERE $__timeFilter(ts)\nGROUP BY time, service ORDER BY time",
+          "format": 0,
+          "pluginVersion": "4.23.5"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 8,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "barchart",
+      "title": "Revenue by region and channel, last full quarter",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "lab-clickhouse"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "lab-clickhouse"
+          },
+          "editorType": "sql",
+          "rawSql": "SELECT region, sumIf(revenue, channel = 'web') AS web, sumIf(revenue, channel = 'mobile') AS mobile,\n  sumIf(revenue, channel = 'partner') AS partner\nFROM lumen.sales\nWHERE ordered_at >= toStartOfQuarter(now()) - INTERVAL 3 MONTH AND ordered_at < toStartOfQuarter(now())\nGROUP BY region ORDER BY region",
+          "format": 1,
+          "pluginVersion": "4.23.5"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {
+        "stacking": "normal",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "xTickLabelRotation": 0
+      }
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Top products, last full quarter",
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "lab-clickhouse"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 11,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "lab-clickhouse"
+          },
+          "editorType": "sql",
+          "rawSql": "SELECT product, category, sum(units) AS units, sum(revenue) AS revenue\nFROM lumen.sales\nWHERE ordered_at >= toStartOfQuarter(now()) - INTERVAL 3 MONTH AND ordered_at < toStartOfQuarter(now())\nGROUP BY product, category ORDER BY revenue DESC LIMIT 15",
+          "format": 1,
+          "pluginVersion": "4.23.5"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "revenue"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+version: 2
+
+models:
+  - name: daily_revenue
+    description: Daily revenue, margin, orders, and customers by region, segment, and channel.
+    meta:
+      label: Daily revenue
+    columns:
+      - name: order_date
+        description: The day of the orders.
+        meta:
+          dimension:
+            type: date
+            time_intervals: [DAY, WEEK, MONTH, QUARTER, YEAR]
+      - name: region
+        meta: { dimension: { type: string } }
+      - name: segment
+        meta: { dimension: { type: string } }
+      - name: channel
+        meta: { dimension: { type: string } }
+      - name: revenue
+        description: Net revenue from completed orders.
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            total_revenue:
+              type: sum
+              label: Revenue
+              format: usd
+              round: 0
+      - name: gross_margin
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            total_gross_margin:
+              type: sum
+              label: Gross margin
+              format: usd
+              round: 0
+      - name: orders
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            total_orders:
+              type: sum
+              label: Orders
+              round: 0
+      - name: customers
+        meta:
+          dimension: { type: number, hidden: true }
+
+  - name: monthly_kpis
+    description: Monthly revenue against target, by region.
+    meta:
+      label: Monthly KPIs
+    columns:
+      - name: month
+        meta:
+          dimension:
+            type: date
+            time_intervals: [MONTH, QUARTER, YEAR]
+      - name: region
+        meta: { dimension: { type: string } }
+      - name: revenue
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            total_revenue:
+              type: sum
+              label: Revenue
+              format: usd
+              round: 0
+      - name: revenue_target
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            total_target:
+              type: sum
+              label: Target
+              format: usd
+              round: 0
+            revenue_attainment:
+              type: number
+              label: Attainment
+              format: percent
+              round: 1
+              sql: "SUM(${TABLE}.revenue) / NULLIF(SUM(${TABLE}.revenue_target), 0)"
+      - name: attainment
+        meta: { dimension: { hidden: true } }
+      - name: orders
+        meta: { dimension: { hidden: true } }
+      - name: active_customers
+        meta: { dimension: { hidden: true } }
+      - name: avg_order_value
+        meta: { dimension: { hidden: true } }
+
+  - name: line_facts
+    description: One row per completed order line, with product and category.
+    meta:
+      label: Order lines
+    columns:
+      - name: order_id
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            order_count:
+              type: count_distinct
+              label: Orders
+      - name: ordered_at
+        meta:
+          dimension:
+            type: timestamp
+            time_intervals: [DAY, WEEK, MONTH, QUARTER]
+      - name: order_date
+        meta: { dimension: { hidden: true } }
+      - name: region
+        meta: { dimension: { type: string } }
+      - name: segment
+        meta: { dimension: { type: string } }
+      - name: channel
+        meta: { dimension: { type: string } }
+      - name: category
+        meta: { dimension: { type: string } }
+      - name: product
+        meta: { dimension: { type: string } }
+      - name: units
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            total_units:
+              type: sum
+              label: Units
+      - name: revenue
+        meta:
+          dimension: { type: number, hidden: true }
+          metrics:
+            total_revenue:
+              type: sum
+              label: Revenue
+              format: usd
+              round: 0

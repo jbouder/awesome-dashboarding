@@ -14,6 +14,8 @@ services:
       GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
       GF_NEWS_NEWS_FEED_ENABLED: "false"
+      # For the ClickHouse datasource. Downloaded on first start.
+      GF_PLUGINS_PREINSTALL: grafana-clickhouse-datasource@4.23.5
     ports:
       - "127.0.0.1:${GRAFANA_PORT:-3001}:3000"
     volumes:

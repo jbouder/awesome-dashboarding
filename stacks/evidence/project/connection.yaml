@@ -1,0 +1,11 @@
+# A direct connection to the lab warehouse, as the read-only role. Queries
+# run live against Postgres. No Evidence Studio account is involved.
+type: postgres
+host: warehouse
+port: 5432
+user: lab_ro
+password: lab_ro
+database: lab
+sslmode: disable
+schema: metrics
+schemas: [metrics, shop, ops]

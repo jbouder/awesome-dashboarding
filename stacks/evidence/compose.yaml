@@ -1,0 +1,16 @@
+# Evidence: reports as Markdown and SQL, served by `evidence serve`.
+# http://localhost:3005, lab / lab (Evidence requires basic auth when it
+# listens beyond the container's loopback).
+services:
+  evidence:
+    build: .
+    image: dashlab-evidence:local
+    profiles: ["evidence"]
+    environment:
+      EVIDENCE_BASIC_USER: lab
+      EVIDENCE_BASIC_PASSWORD: ${EVIDENCE_PASSWORD:-lab}
+    ports:
+      - "127.0.0.1:${EVIDENCE_PORT:-3005}:3000"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
