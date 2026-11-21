@@ -1,0 +1,44 @@
+# Holotable: generative, natural-language monitoring dashboards.
+# http://localhost:3000, no sign-in (local mode: you are the owner).
+services:
+  holotable:
+    image: ghcr.io/jbouder/holotable:quickstart
+    profiles: ["holotable"]
+    environment:
+      # Holotable's own demo source, plus the lab warehouse for the local owner.
+      SOURCE_SECRET_REFS: "TS_METRICS:demo,local;LAB_WAREHOUSE:local"
+      LAB_WAREHOUSE_USERNAME: lab_ro
+      LAB_WAREHOUSE_PASSWORD: lab_ro
+      SESSION_SECRET: ${HOLOTABLE_SESSION_SECRET:-dashlab-local-only-session-secret-0123456789}
+      # The model, from the lab's LLM_* settings in .env. With no model,
+      # dashboards still load, but generation, Explore, and chat are off.
+      AI_PROVIDER: openai-compatible
+      AI_MODEL: ${LLM_MODEL:-}
+      OPENAI_BASE_URL: ${LLM_BASE_URL:-}
+      OPENAI_API_KEY: ${LLM_API_KEY:-}
+    ports:
+      - "127.0.0.1:${HOLOTABLE_PORT:-3000}:3000"
+    volumes:
+      - holotable:/var/lib/postgresql/data
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/ready').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 15s
+
+  holotable-register:
+    image: dashlab-seed:local
+    profiles: ["holotable"]
+    command: ["python", "/lab/register.py"]
+    volumes:
+      - ./register.py:/lab/register.py:ro
+    depends_on:
+      holotable:
+        condition: service_healthy
+
+volumes:
+  holotable:

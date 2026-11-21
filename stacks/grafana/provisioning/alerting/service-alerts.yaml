@@ -1,0 +1,40 @@
+# Fires when any service's error rate over the last minute is above 5%.
+# Trigger one with `make incident`.
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: service-health
+    folder: Lab
+    interval: 10s
+    rules:
+      - uid: lab-high-error-rate
+        title: High error rate
+        condition: C
+        for: 20s
+        noDataState: OK
+        execErrState: Error
+        labels:
+          severity: page
+        annotations:
+          summary: "{{ $labels.service }} error rate is {{ humanizePercentage $values.A.Value }}"
+        data:
+          - refId: A
+            relativeTimeRange: { from: 60, to: 0 }
+            datasourceUid: lab-warehouse
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              editorMode: code
+              rawSql: >-
+                SELECT service, sum(errors)::float / nullif(sum(requests), 0) AS error_rate
+                FROM ops.request_metrics WHERE ts > now() - interval '1 minute'
+                GROUP BY service
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [0.05] }

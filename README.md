@@ -5,12 +5,12 @@ each tool on your own machine.
 
 Building a dashboard used to take weeks. Now it can take a prompt. This repo
 sorts the open source landscape into four dashboard types, says what each
-tool is best at and what AI can do with it, and (soon) gives you one command
-per tool to run it locally against the same seed data. Same data, every tool,
+tool is best at and what AI can do with it, and gives you one command per
+tool to run it locally against the same seed data. Same data, every tool,
 side by side.
 
-> **Status:** the guide is here. The local lab (Dockerfiles, Compose stacks,
-> seed data, scripts) is in progress. See [Roadmap](#roadmap).
+> **Try it:** `make up all`, then open the URLs it prints. You need Docker
+> with Compose. See [Run them locally](#run-them-locally).
 
 ## Contents
 
@@ -66,8 +66,9 @@ Most tools also span several types. A tool is listed under its primary job.
 - **AI** says what AI can do with the tool today: a built-in assistant, an
   MCP server an agent can call, a semantic layer that grounds answers, or a
   plain-text format that AI writes well.
-- **Local** says whether this repo runs the tool for you. *Planned* means it
-  is on the roadmap. A check means the stack ships today.
+- **Local** says whether this repo runs the tool for you. A stack name links
+  to its tour. *Guide* means a written setup against the lab's data, with no
+  container. *Planned* means it is on the roadmap.
 - **Commercial equivalents** are listed once per type, so you can map the
   tools you already know.
 
@@ -80,8 +81,8 @@ write and easy to review.
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
 | [Evidence](https://github.com/evidence-dev/evidence) | MIT | Polished reports as code, versioned in Git | Plain Markdown and SQL, easy for AI to write | Planned |
-| [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | KPI dashboards with row-level security in the free build | MCP server | Planned |
-| [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Self-service for non-technical users | Metabot natural-language questions | Planned |
+| [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | KPI dashboards with row-level security in the free build | MCP server | [`superset`](stacks/superset/) |
+| [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Self-service for non-technical users | Metabot natural-language questions | [`metabase`](stacks/metabase/) |
 | [Observable Framework](https://github.com/observablehq/framework) | ISC | Fast static data apps and reports | Code-first, easy for AI to write | Planned |
 | [Quarto](https://github.com/quarto-dev/quarto-cli) | MIT | Reports and dashboards from notebooks | Plain-text documents, easy for AI to write | Planned |
 
@@ -96,8 +97,8 @@ frameworks belong here too when the analysis needs code.
 
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
-| [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | Drill-down, SQL Lab, embedding with no license obligations | MCP server | Planned |
-| [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Point-and-click question builder | Metabot natural-language questions | Planned |
+| [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | Drill-down, SQL Lab, embedding with no license obligations | MCP server | [`superset`](stacks/superset/) |
+| [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Point-and-click question builder | Metabot natural-language questions | [`metabase`](stacks/metabase/) |
 | [Lightdash](https://github.com/lightdash/lightdash) | MIT | BI on top of dbt models | dbt metrics give agents a semantic layer | Planned |
 | [Cube](https://github.com/cube-js/cube) | Apache 2.0 | Headless semantic layer with SQL, REST, and GraphQL APIs | Grounds any agent in governed metrics | Planned |
 | [Streamlit](https://github.com/streamlit/streamlit) | Apache 2.0 | Python data apps | The most common target for AI-written apps | Planned |
@@ -116,7 +117,7 @@ covers most needs with no license fee.
 
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
-| [Grafana](https://github.com/grafana/grafana) | AGPL-3.0 | Live panels and alerting | MCP server ([mcp-grafana](https://github.com/grafana/mcp-grafana)) | Planned |
+| [Grafana](https://github.com/grafana/grafana) | AGPL-3.0 | Live panels and alerting | MCP server ([mcp-grafana](https://github.com/grafana/mcp-grafana)) | [`grafana`](stacks/grafana/) |
 | [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | Apache 2.0 | Logs and search analytics, the open Kibana fork | Chat assistant plugin ([dashboards-assistant](https://github.com/opensearch-project/dashboards-assistant)) | Planned |
 | [Rill](https://github.com/rilldata/rill) | Apache 2.0 | Fast metrics explorer on DuckDB or ClickHouse | Metrics defined as code, easy for AI to write | Planned |
 | [ClickHouse](https://github.com/ClickHouse/ClickHouse) | Apache 2.0 | Real-time OLAP engine | MCP server ([mcp-clickhouse](https://github.com/ClickHouse/mcp-clickhouse)) | Planned |
@@ -136,9 +137,9 @@ use. It is young and changing fast.
 
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
-| [Holotable](https://github.com/jbouder/holotable) | Apache 2.0 | Live natural-language monitoring dashboards | The model writes a validated spec, never the data. SQL is guarded | Planned |
-| [WrenAI](https://github.com/Canner/WrenAI) | Apache 2.0 | Governed text-to-SQL and dashboards for your own agents | Semantic layer and context kept as YAML and Markdown in Git | Planned |
-| [Metabase Metabot](https://github.com/metabase/metabase) | AGPL-3.0 | AI questions inside an existing BI tool | Answers become saved Metabase questions | Planned |
+| [Holotable](https://github.com/jbouder/holotable) | Apache 2.0 | Live natural-language monitoring dashboards | The model writes a validated spec, never the data. SQL is guarded | [`holotable`](stacks/holotable/) |
+| [WrenAI](https://github.com/Canner/WrenAI) | Apache 2.0 | Governed text-to-SQL and dashboards for your own agents | Semantic layer and context kept as YAML and Markdown in Git | [Guide](stacks/wrenai/) |
+| [Metabase Metabot](https://github.com/metabase/metabase) | AGPL-3.0 | AI questions inside an existing BI tool | Answers become saved Metabase questions | [`metabase`](stacks/metabase/) |
 | [Vercel AI SDK](https://github.com/vercel/ai) | Apache 2.0 | Generative UI building blocks | A library, not a platform | Library |
 | [A2UI](https://github.com/a2ui-project/a2ui) | Apache 2.0 | Agents stream layout, apps render native components | A framework, not a platform | Library |
 
@@ -205,56 +206,95 @@ Open source covers three types well. Generative is the youngest.
 
 ## Run them locally
 
-> **Coming soon.** This section describes the target experience. The stacks
-> are not in the repo yet.
-
-The goal: one prerequisite (Docker with Compose v2), one command per tool,
-every tool loaded with the same seed data.
+You need Docker with Compose v2 and `make`. Running every stack at once takes
+about 4 GB of memory for Docker. The first start downloads the images, which
+takes a few minutes. After that, `make up all` is ready in under a minute.
 
 ```sh
 git clone https://github.com/jbouder/awesome-dashboarding.git
 cd awesome-dashboarding
-make list              # every stack, its type, port, and license
-make up superset       # start one tool with seed data loaded
-make up grafana        # start another alongside it
-make down              # stop everything
-make reset             # stop everything and delete volumes
+make up superset grafana   # start one or more stacks, seed data loaded
+make up all                # or start every stack
+make list                  # every stack, its type, URL, license, and sign-in
+make incident              # break something, and watch Grafana's alert fire
+make down                  # stop everything, keep the data
+make reset                 # stop everything and delete all data
 ```
 
-Each tool lives in its own folder under `stacks/` with a `compose.yaml`, any
-Dockerfiles it needs, a seed step, and a short README with the login, the
-port, and a guided tour. Stacks share one data service, so you can run two
-side by side and compare their answers.
+| Stack | Type | URL | Sign-in | Tour |
+| --- | --- | --- | --- | --- |
+| Superset | Strategic, analytical | <http://localhost:8088> | `admin` / `admin` | [stacks/superset](stacks/superset/) |
+| Metabase | Strategic, analytical | <http://localhost:3002> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/metabase](stacks/metabase/) |
+| Grafana | Operational | <http://localhost:3001> | None to view, `admin` / `admin` to edit | [stacks/grafana](stacks/grafana/) |
+| Holotable | Generative | <http://localhost:3000> | None | [stacks/holotable](stacks/holotable/) |
+| WrenAI | Generative | Your own agent | | [stacks/wrenai](stacks/wrenai/) |
 
-Generative stacks need a model. They take an Anthropic or OpenAI-compatible
-API key from `.env`, or run a local model through Ollama with no key.
+These are local test passwords. Every port is bound to `127.0.0.1`, so
+nothing is reachable from your network. Do not reuse them elsewhere.
+
+### How it fits together
+
+```text
+              ┌───────────────────────── warehouse (TimescaleDB) ─────────────────────────┐
+  seed ─────▶ │ shop.*     raw tables: customers, products, orders, order_items, targets │
+  (one-shot)  │ metrics.*  semantic layer: one view per metric definition               │
+  stream ───▶ │ ops.*      live service metrics every 5 s, and incidents                │
+              └──────────────▲──────────────▲──────────────▲──────────────▲─────────────┘
+                             │              │              │              │   all read-only
+                         Superset       Metabase        Grafana       Holotable   as lab_ro
+```
+
+- `core/` is the shared data layer. It always starts.
+- `stacks/<name>/` holds one tool: its `compose.yaml`, any config, a setup
+  script that connects it to the warehouse and builds starter dashboards, and
+  a README with the tour.
+- `scripts/lab.sh` is what `make` runs. Each stack is a Compose profile, so
+  stacks start and stop independently on one shared network.
+
+### Generative stacks need a model
+
+Copy `.env.example` to `.env` and set `LLM_BASE_URL`, `LLM_API_KEY`, and
+`LLM_MODEL`. Any OpenAI-compatible endpoint works, including Anthropic's and
+a local Ollama with no key. Holotable and Metabase's Metabot use it. Without
+a model, every stack still starts and every saved dashboard still loads.
 
 ## Seed data
 
-> **Coming soon.**
+Every stack reads the same synthetic dataset from one warehouse. It is
+generated from a fixed random seed, so the same seed on the same day gives
+the same numbers. Dates run up to today.
 
-Every stack loads the same synthetic dataset, generated from a fixed random
-seed so results match from run to run. The plan:
+- **Lumen Supply**, a made-up online retailer of outdoor and home gear: about
+  57,000 orders over two years, 6,000 customers, 60 products in 6 categories,
+  4 regions, 3 channels, and a monthly revenue target per region.
+- **A semantic layer** in schema `metrics`: revenue, margin, orders, active
+  customers, average order value, attainment, error rate, and latency, each
+  defined once as a view. [`semantic/metrics.yml`](semantic/metrics.yml)
+  documents every definition.
+- **Live service metrics** in schema `ops`: requests, errors, and p95
+  latency for five services, written every 5 seconds. `make incident` makes
+  one service fail so you can watch an alert fire.
 
-- **Business tables** for strategic and analytical views: customers,
-  products, orders, order items, subscriptions, and monthly targets, covering
-  about two years.
-- **A live event stream** for operational views: request rates, latency, and
-  errors written every few seconds, with a script to trigger an incident on
-  demand so you can watch an alert fire.
-- **A semantic model** that defines core metrics (revenue, active customers,
-  churn, error rate) once, so generative tools can be compared grounded and
-  ungrounded.
+The data has a story to find. Ask every tool **"Which region missed its
+revenue target last quarter, and why?"** EMEA came in about 10% under target,
+because orders through its partner channel fell by about two thirds. A tool
+that finds the partner channel has done real analysis. Then ask the same
+question against the raw `shop` tables and see whether the answers still
+agree.
 
-The same question asked of every tool, such as "What drove the drop in
-revenue last quarter?", is the fastest way to see how they differ.
+`make reseed` regenerates the data, for example after changing `SEED` in
+`.env`.
 
 ## Roadmap
 
 1. **Guide.** This README. Done.
-2. **Local lab.** Seed data generator, shared data service, a Compose stack
-   and seed step per tool, a `Makefile`, and per-stack READMEs.
-3. **Comparison scripts.** One set of questions run against each tool, with
+2. **Local lab.** Shared warehouse, seed data, live metrics, and stacks for
+   Superset, Metabase, Grafana, and Holotable, plus a WrenAI guide. Done.
+3. **More stacks.** Lightdash, Cube, Rill, Streamlit, marimo, and
+   OpenSearch Dashboards. Evidence is waiting on its new CLI: the
+   `npm`-based workflow is deprecated, and the lab has not yet confirmed the
+   new one runs with no account.
+4. **Comparison scripts.** One set of questions run against each tool, with
    the answers collected side by side.
 
 ## Contributing
@@ -265,6 +305,11 @@ Corrections and additions are welcome. Open an issue or a pull request.
   one-line equivalents.
 - Fill in every column, including what AI can do with the tool. "None yet" is
   a fine answer.
+- A new stack goes in `stacks/<name>/` with a `compose.yaml` behind a profile
+  of the same name, a setup script that connects it to the warehouse as
+  `lab_ro`, and a README with a tour. Register it in `scripts/lab.sh` and
+  `compose.yaml`. Run `make reset && make up <name>` before opening a pull
+  request.
 - List a tool that fits several types under its primary job.
 - Link to the project's own repository, not a review or a listicle.
 - Keep it neutral. Say what a tool does well and where it falls short.

@@ -1,0 +1,51 @@
+# The shared data layer every stack reads. It always starts.
+#
+#   warehouse  TimescaleDB with the seed data (schemas shop, ops, metrics)
+#   seed       one-shot: generates and loads the data, skips if loaded
+#   stream     writes live service metrics every few seconds
+
+x-warehouse-url: &warehouse-url postgresql://lab:${WAREHOUSE_PASSWORD:-lab}@warehouse:5432/lab
+
+services:
+  warehouse:
+    image: timescale/timescaledb:2.32.1-pg17
+    environment:
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: ${WAREHOUSE_PASSWORD:-lab}
+      POSTGRES_DB: lab
+      TIMESCALEDB_TELEMETRY: "off"
+    ports:
+      - "127.0.0.1:${WAREHOUSE_PORT:-5433}:5432"
+    volumes:
+      - warehouse:/var/lib/postgresql/data
+      - ./warehouse/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d lab"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  seed:
+    build: ./seed
+    image: dashlab-seed:local
+    environment:
+      WAREHOUSE_URL: *warehouse-url
+      SEED: ${SEED:-42}
+      SEED_FORCE: ${SEED_FORCE:-0}
+    depends_on:
+      warehouse:
+        condition: service_healthy
+
+  stream:
+    image: dashlab-seed:local
+    command: ["python", "stream.py"]
+    environment:
+      WAREHOUSE_URL: *warehouse-url
+      STREAM_INTERVAL: ${STREAM_INTERVAL:-5}
+    restart: unless-stopped
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+
+volumes:
+  warehouse:

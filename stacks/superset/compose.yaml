@@ -1,0 +1,74 @@
+# Apache Superset: strategic and analytical dashboards.
+# http://localhost:8088, admin / admin
+
+x-superset: &superset
+  image: apache/superset:6.1.0-dev
+  profiles: ["superset"]
+  environment: &superset-env
+    SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+    SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-dashlab-local-only-change-me-7c1f0e}
+    SUPERSET_METADATA_URL: postgresql+psycopg2://lab:${WAREHOUSE_PASSWORD:-lab}@warehouse:5432/superset
+    SUPERSET_ADMIN_USERNAME: admin
+    SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-admin}
+  volumes:
+    - ./superset_config.py:/app/pythonpath/superset_config.py:ro
+    - ./init.sh:/app/lab/init.sh:ro
+    - ./bootstrap.py:/app/lab/bootstrap.py:ro
+
+services:
+  superset-init:
+    <<: *superset
+    command: ["bash", "/app/lab/init.sh"]
+    depends_on:
+      warehouse:
+        condition: service_healthy
+
+  superset:
+    <<: *superset
+    command: ["/usr/bin/run-server.sh"]
+    ports:
+      - "127.0.0.1:${SUPERSET_PORT:-8088}:8088"
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8088/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
+
+  superset-bootstrap:
+    <<: *superset
+    command: ["python", "/app/lab/bootstrap.py"]
+    environment:
+      <<: *superset-env
+      LAB_RO_URL: postgresql+psycopg2://lab_ro:lab_ro@warehouse:5432/lab
+    depends_on:
+      superset:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+
+  # Superset's MCP server, for agents. http://localhost:5008/mcp
+  superset-mcp:
+    <<: *superset
+    command: ["superset", "mcp", "run", "--host", "0.0.0.0", "--port", "5008"]
+    ports:
+      - "127.0.0.1:${SUPERSET_MCP_PORT:-5008}:5008"
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    healthcheck:
+      # No HTTP health route. A POST without a session still proves the MCP
+      # server is listening and answering.
+      test:
+        - CMD-SHELL
+        - >-
+          curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:5008/mcp
+          -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream'
+          -d '{"jsonrpc":"2.0","id":1,"method":"ping"}' | grep -qv '^000$'
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 20s

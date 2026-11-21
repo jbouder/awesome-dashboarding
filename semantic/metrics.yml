@@ -1,0 +1,71 @@
+# The lab's metric definitions, in one place.
+#
+# Each metric is implemented once, as a view in the warehouse's `metrics`
+# schema (core/seed/semantic.sql). Point a tool or an agent at those views
+# and it gets these definitions. Point it at the raw `shop` tables and it has
+# to invent its own, which is the point of comparing the two.
+
+dataset:
+  name: Lumen Supply
+  description: >-
+    A made-up online retailer of outdoor and home gear. About two years of
+    orders up to today, plus live service metrics.
+  story: >-
+    In the last full calendar quarter, EMEA missed its revenue target by about
+    10% because orders through the partner channel there fell by about two
+    thirds. LATAM also misses, by less and with no single cause. North
+    America and APAC hit target.
+
+metrics:
+  - name: revenue
+    description: Net revenue from completed orders.
+    definition: sum(quantity * unit_price * (1 - discount)) over order lines whose order status is completed
+    excludes: refunded and canceled orders
+    views: [metrics.order_facts, metrics.line_facts, metrics.daily_revenue, metrics.monthly_kpis]
+
+  - name: gross_margin
+    description: Revenue minus product cost.
+    definition: sum(quantity * (unit_price * (1 - discount) - unit_cost)) over completed orders
+    views: [metrics.order_facts, metrics.daily_revenue]
+
+  - name: orders
+    description: Count of completed orders.
+    views: [metrics.daily_revenue, metrics.monthly_kpis]
+
+  - name: active_customers
+    description: Distinct customers with at least one completed order in the period.
+    views: [metrics.daily_revenue, metrics.monthly_kpis]
+
+  - name: avg_order_value
+    description: Revenue divided by orders.
+    views: [metrics.monthly_kpis]
+
+  - name: revenue_target
+    description: The monthly plan per region. Last year's revenue for the month plus 18%.
+    views: [metrics.monthly_kpis]
+
+  - name: attainment
+    description: Revenue divided by revenue target.
+    views: [metrics.monthly_kpis]
+
+  - name: error_rate
+    description: Errors divided by requests, per service.
+    views: [metrics.service_health]
+
+  - name: p95_latency_ms
+    description: 95th percentile request latency in milliseconds, per service.
+    views: [metrics.service_health]
+
+dimensions:
+  region: [North America, EMEA, APAC, LATAM]
+  segment: [Consumer, SMB, Enterprise]
+  channel: [web, mobile, partner]
+  category: [Camping, Apparel, Lighting, Kitchen, Fitness, Electronics]
+  service: [web, checkout, payments, search, inventory]
+
+questions:
+  # Ask every tool the same questions and compare the answers.
+  - Which region missed its revenue target last quarter, and why?
+  - What was revenue last quarter, and how does it compare to target?
+  - Which product categories drive the most revenue for Enterprise customers?
+  - Which service has the highest error rate right now?

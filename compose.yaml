@@ -1,0 +1,11 @@
+# The dashboard lab. Use `make` (see `make help`) rather than calling this
+# directly. Core services always run. Each stack is behind a profile named
+# after its folder in stacks/.
+name: dashlab
+
+include:
+  - core/compose.yaml
+  - stacks/superset/compose.yaml
+  - stacks/grafana/compose.yaml
+  - stacks/holotable/compose.yaml
+  - stacks/metabase/compose.yaml
