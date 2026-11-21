@@ -213,13 +213,26 @@ takes a few minutes. After that, `make up all` is ready in under a minute.
 ```sh
 git clone https://github.com/jbouder/awesome-dashboarding.git
 cd awesome-dashboarding
-make up superset grafana   # start one or more stacks, seed data loaded
-make up all                # or start every stack
-make list                  # every stack, its type, URL, license, and sign-in
-make incident              # break something, and watch Grafana's alert fire
-make down                  # stop everything, keep the data
-make reset                 # stop everything and delete all data
+make doctor                # check Docker, memory, ports, and tools
+make up all                # start every stack, seed data loaded
+make smoke                 # check every stack works and agrees on the numbers
+make open all              # open them in the browser
 ```
+
+Run `make help` for every command. The ones you will use most:
+
+| Command | What it does |
+| --- | --- |
+| `make up superset grafana` | Start some stacks. Stacks already running keep running |
+| `make stop metabase` | Stop one stack and keep its data |
+| `make status` | Each stack's state, and whether its URL responds |
+| `make story` | The questions to ask every tool, and the warehouse's answer |
+| `make incident` | Three minutes of errors on checkout. Watch Grafana's alert fire |
+| `make psql` | A read-only SQL shell on the warehouse |
+| `make sql Q="SELECT ..."` | Run one query on the warehouse |
+| `make env` | Create `.env` from `.env.example`, to add a model |
+| `make down` | Stop everything and keep the data |
+| `make reset` | Stop everything and delete all data |
 
 | Stack | Type | URL | Sign-in | Tour |
 | --- | --- | --- | --- | --- |
@@ -308,8 +321,9 @@ Corrections and additions are welcome. Open an issue or a pull request.
 - A new stack goes in `stacks/<name>/` with a `compose.yaml` behind a profile
   of the same name, a setup script that connects it to the warehouse as
   `lab_ro`, and a README with a tour. Register it in `scripts/lab.sh` and
-  `compose.yaml`. Run `make reset && make up <name>` before opening a pull
-  request.
+  `compose.yaml`, and add its checks to `scripts/smoke.py`. Before opening a
+  pull request, run `make lint`, then `make reset && make up <name> && make
+  smoke`.
 - List a tool that fits several types under its primary job.
 - Link to the project's own repository, not a review or a listicle.
 - Keep it neutral. Say what a tool does well and where it falls short.
