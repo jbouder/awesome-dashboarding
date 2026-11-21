@@ -1,0 +1,6 @@
+# One row per completed order line, from the semantic layer.
+type: model
+connector: warehouse
+sql: >
+  SELECT order_id, ordered_at, region, segment, channel, category, product, units, revenue
+  FROM metrics.line_facts

@@ -22,22 +22,48 @@ still work.
     with a description the model reads.
   - **Lumen Supply (live service metrics)**: `ops.request_metrics` and
     `ops.incidents`.
+- Three linked dashboards, defined in `dashboards.py`:
+  - **Lumen Supply: executive overview**: last quarter's revenue,
+    attainment, and orders, attainment by region as bars, revenue against
+    target, a treemap of revenue by region and channel, and a region table.
+    **Click a region** in the bars, the treemap, or the table to drill into
+    its detail. A panel menu link opens service health.
+  - **Lumen Supply: region detail**: region and channel pickers, KPIs,
+    revenue against target, revenue by channel per quarter, a flow from
+    channel to segment to category, a segment donut, weekly revenue, and top
+    products. **Click a channel** in a chart or the flow to filter the whole
+    dashboard to it.
+  - **Lumen Supply: service health**: live, every 5 seconds. A tile per
+    service, error rate, latency, and traffic by service, and recent
+    incidents. **Click a service** to show only it.
 
 The model sees table and column names and descriptions, never rows. It
 writes a dashboard spec. Holotable checks the SQL, runs it, and streams the
 results. Refreshing a panel runs the SQL again. It does not call the model
-again.
+again. The seeded dashboards need no model at all.
 
 ## Tour
 
-1. Open **Data sources**. Both lab sources are listed. Press **Test** on one
-   to see the read-only check pass.
-2. Create a dashboard on **Lumen Supply (semantic layer)** and ask:
-   "Which region missed its revenue target last quarter, and why?"
-3. Refine it: "Break EMEA down by channel."
-4. Create one on **Lumen Supply (live service metrics)** and ask: "Error rate
-   and p95 latency per service, live." Then run `make incident` and watch it.
-5. Save a dashboard, reload it, and note that it loads without the model.
+1. Open **Dashboards → Lumen Supply: executive overview**. EMEA is the red
+   bar.
+2. Click EMEA. The region detail opens filtered to EMEA.
+3. In **Revenue by channel, last four full quarters**, click the thin partner
+   slice of the last bar. Every panel narrows to the partner channel. Put it
+   back with the Channel picker.
+4. Open **Lumen Supply: service health** and run `make incident`. The
+   checkout tile turns red within a minute.
+5. With a model set, ask for a new dashboard on **Lumen Supply (semantic
+   layer)**: "Which region missed its revenue target last quarter, and why?"
+   Compare what it builds with the seeded dashboards.
+
+## Change the seeded dashboards
+
+Edit them in Holotable and your edits are kept. To reset them to the specs in
+`dashboards.py`, run:
+
+```sh
+HOLOTABLE_REBUILD=1 make restart holotable
+```
 
 ## Compare
 

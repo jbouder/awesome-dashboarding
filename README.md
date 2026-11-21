@@ -68,7 +68,7 @@ Most tools also span several types. A tool is listed under its primary job.
   plain-text format that AI writes well.
 - **Local** says whether this repo runs the tool for you. A stack name links
   to its tour. *Guide* means a written setup against the lab's data, with no
-  container. *Planned* means it is on the roadmap.
+  container. *TBD* means not yet.
 - **Commercial equivalents** are listed once per type, so you can map the
   tools you already know.
 
@@ -80,11 +80,11 @@ write and easy to review.
 
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
-| [Evidence](https://github.com/evidence-dev/evidence) | MIT | Polished reports as code, versioned in Git | Plain Markdown and SQL, easy for AI to write | Planned |
+| [Evidence](https://github.com/evidence-dev/evidence) | MIT | Polished reports as code, versioned in Git | Plain Markdown and SQL, easy for AI to write | TBD |
 | [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | KPI dashboards with row-level security in the free build | MCP server | [`superset`](stacks/superset/) |
 | [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Self-service for non-technical users | Metabot natural-language questions | [`metabase`](stacks/metabase/) |
-| [Observable Framework](https://github.com/observablehq/framework) | ISC | Fast static data apps and reports | Code-first, easy for AI to write | Planned |
-| [Quarto](https://github.com/quarto-dev/quarto-cli) | MIT | Reports and dashboards from notebooks | Plain-text documents, easy for AI to write | Planned |
+| [Observable Framework](https://github.com/observablehq/framework) | ISC | Fast static data apps and reports | Code-first, easy for AI to write | TBD |
+| [Quarto](https://github.com/quarto-dev/quarto-cli) | MIT | Reports and dashboards from notebooks | Plain-text documents, easy for AI to write | TBD |
 
 **Commercial equivalents:** Power BI, Tableau, Looker Studio, Domo, SAP
 Analytics Cloud, MicroStrategy, IBM Cognos.
@@ -99,11 +99,11 @@ frameworks belong here too when the analysis needs code.
 | --- | --- | --- | --- | --- |
 | [Apache Superset](https://github.com/apache/superset) | Apache 2.0 | Drill-down, SQL Lab, embedding with no license obligations | MCP server | [`superset`](stacks/superset/) |
 | [Metabase](https://github.com/metabase/metabase) | AGPL-3.0 | Point-and-click question builder | Metabot natural-language questions | [`metabase`](stacks/metabase/) |
-| [Lightdash](https://github.com/lightdash/lightdash) | MIT | BI on top of dbt models | dbt metrics give agents a semantic layer | Planned |
-| [Cube](https://github.com/cube-js/cube) | Apache 2.0 | Headless semantic layer with SQL, REST, and GraphQL APIs | Grounds any agent in governed metrics | Planned |
-| [Streamlit](https://github.com/streamlit/streamlit) | Apache 2.0 | Python data apps | The most common target for AI-written apps | Planned |
-| [Plotly Dash](https://github.com/plotly/dash) | MIT | Python data apps with fine-grained callbacks | Plain Python, easy for AI to write | Planned |
-| [marimo](https://github.com/marimo-team/marimo) | Apache 2.0 | Reactive notebooks that deploy as apps | Built-in AI assistant, notebooks are plain Python | Planned |
+| [Lightdash](https://github.com/lightdash/lightdash) | MIT | BI on top of dbt models | dbt metrics give agents a semantic layer | TBD |
+| [Cube](https://github.com/cube-js/cube) | Apache 2.0 | Headless semantic layer with SQL, REST, and GraphQL APIs | Grounds any agent in governed metrics | [`cube`](stacks/cube/) |
+| [Streamlit](https://github.com/streamlit/streamlit) | Apache 2.0 | Python data apps | The most common target for AI-written apps | [`streamlit`](stacks/streamlit/) |
+| [Plotly Dash](https://github.com/plotly/dash) | MIT | Python data apps with fine-grained callbacks | Plain Python, easy for AI to write | TBD |
+| [marimo](https://github.com/marimo-team/marimo) | Apache 2.0 | Reactive notebooks that deploy as apps | Built-in AI assistant, notebooks are plain Python | [`marimo`](stacks/marimo/) |
 
 **Commercial equivalents:** Tableau, Looker, Qlik, Sigma, Omni, Hex,
 Databricks AI/BI.
@@ -118,11 +118,11 @@ covers most needs with no license fee.
 | Tool | License | Best at | AI | Local |
 | --- | --- | --- | --- | --- |
 | [Grafana](https://github.com/grafana/grafana) | AGPL-3.0 | Live panels and alerting | MCP server ([mcp-grafana](https://github.com/grafana/mcp-grafana)) | [`grafana`](stacks/grafana/) |
-| [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | Apache 2.0 | Logs and search analytics, the open Kibana fork | Chat assistant plugin ([dashboards-assistant](https://github.com/opensearch-project/dashboards-assistant)) | Planned |
-| [Rill](https://github.com/rilldata/rill) | Apache 2.0 | Fast metrics explorer on DuckDB or ClickHouse | Metrics defined as code, easy for AI to write | Planned |
-| [ClickHouse](https://github.com/ClickHouse/ClickHouse) | Apache 2.0 | Real-time OLAP engine | MCP server ([mcp-clickhouse](https://github.com/ClickHouse/mcp-clickhouse)) | Planned |
-| [Apache Druid](https://github.com/apache/druid) / [Apache Pinot](https://github.com/apache/pinot) | Apache 2.0 | Real-time OLAP at high ingest rates | Engine only | Planned |
-| [InfluxDB](https://github.com/influxdata/influxdb) | MIT / Apache 2.0 | Purpose-built time-series database | Engine only | Planned |
+| [OpenSearch Dashboards](https://github.com/opensearch-project/OpenSearch-Dashboards) | Apache 2.0 | Logs and search analytics, the open Kibana fork | Chat assistant plugin ([dashboards-assistant](https://github.com/opensearch-project/dashboards-assistant)) | TBD |
+| [Rill](https://github.com/rilldata/rill) | Apache 2.0 | Fast metrics explorer on DuckDB or ClickHouse | Metrics defined as code, easy for AI to write | [`rill`](stacks/rill/) |
+| [ClickHouse](https://github.com/ClickHouse/ClickHouse) | Apache 2.0 | Real-time OLAP engine | MCP server ([mcp-clickhouse](https://github.com/ClickHouse/mcp-clickhouse)) | TBD |
+| [Apache Druid](https://github.com/apache/druid) / [Apache Pinot](https://github.com/apache/pinot) | Apache 2.0 | Real-time OLAP at high ingest rates | Engine only | TBD |
+| [InfluxDB](https://github.com/influxdata/influxdb) | MIT / Apache 2.0 | Purpose-built time-series database | Engine only | TBD |
 
 **Commercial equivalents:** Datadog, New Relic, Dynatrace, Grafana Cloud,
 Microsoft Fabric Real-Time Intelligence, Tinybird.
@@ -156,7 +156,7 @@ comes in two flavors with very different costs.
 | | Generated at runtime | AI-built |
 | --- | --- | --- |
 | **What happens** | The tool assembles a dashboard per question, on governed data | AI writes the dashboard as code, once. You own it from there |
-| **Open source examples** | Holotable, WrenAI, Metabase Metabot | AI-written Streamlit, Dash, marimo, or Evidence apps |
+| **Open source examples** | Holotable, WrenAI, Metabase Metabot | AI-written Streamlit, Dash, marimo, or Evidence apps. The lab's [Streamlit](stacks/streamlit/) and [marimo](stacks/marimo/) stacks are two |
 | **You maintain** | Nothing new | A new app to host, secure, and keep correct |
 
 AI-built reports are fast to build and costly to sprawl.
@@ -171,7 +171,8 @@ AI-built reports are fast to build and costly to sprawl.
 
 Governance is the big one. An AI-built dashboard usually queries raw tables
 with metrics defined on the spot, so two people asking for revenue can get
-two different answers.
+two different answers. The lab's Streamlit app shows it: switch it to raw
+tables and last quarter's revenue goes from $5.64M to $6.54M.
 
 **Rule of thumb:** use AI-built reports to explore and prototype. Graduate
 the good ones into a governed tool.
@@ -207,7 +208,7 @@ Open source covers three types well. Generative is the youngest.
 ## Run them locally
 
 You need Docker with Compose v2 and `make`. Running every stack at once takes
-about 4 GB of memory for Docker. The first start downloads the images, which
+about 5 GB of memory for Docker. The first start downloads the images, which
 takes a few minutes. After that, `make up all` is ready in under a minute.
 
 ```sh
@@ -239,7 +240,11 @@ Run `make help` for every command. The ones you will use most:
 | Superset | Strategic, analytical | <http://localhost:8088> | `admin` / `admin` | [stacks/superset](stacks/superset/) |
 | Metabase | Strategic, analytical | <http://localhost:3002> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/metabase](stacks/metabase/) |
 | Grafana | Operational | <http://localhost:3001> | None to view, `admin` / `admin` to edit | [stacks/grafana](stacks/grafana/) |
+| Rill | Analytical, operational | <http://localhost:9009> | None | [stacks/rill](stacks/rill/) |
 | Holotable | Generative | <http://localhost:3000> | None | [stacks/holotable](stacks/holotable/) |
+| Cube | Semantic layer | <http://localhost:4000> | None | [stacks/cube](stacks/cube/) |
+| Streamlit | AI-built app | <http://localhost:3003> | None | [stacks/streamlit](stacks/streamlit/) |
+| marimo | AI-built app | <http://localhost:3004> | None | [stacks/marimo](stacks/marimo/) |
 | WrenAI | Generative | Your own agent | | [stacks/wrenai](stacks/wrenai/) |
 
 These are local test passwords. Every port is bound to `127.0.0.1`, so
@@ -252,9 +257,10 @@ nothing is reachable from your network. Do not reuse them elsewhere.
   seed ─────▶ │ shop.*     raw tables: customers, products, orders, order_items, targets │
   (one-shot)  │ metrics.*  semantic layer: one view per metric definition               │
   stream ───▶ │ ops.*      live service metrics every 5 s, and incidents                │
-              └──────────────▲──────────────▲──────────────▲──────────────▲─────────────┘
-                             │              │              │              │   all read-only
-                         Superset       Metabase        Grafana       Holotable   as lab_ro
+              └──────────────────────────────────▲───────────────────────────────────┘
+                                                 │                        all read-only
+                Superset, Metabase, Grafana, Rill, Holotable, Cube,     as lab_ro
+                Streamlit, marimo
 ```
 
 - `core/` is the shared data layer. It always starts.
@@ -268,7 +274,8 @@ nothing is reachable from your network. Do not reuse them elsewhere.
 
 Copy `.env.example` to `.env` and set `LLM_BASE_URL`, `LLM_API_KEY`, and
 `LLM_MODEL`. Any OpenAI-compatible endpoint works, including Anthropic's and
-a local Ollama with no key. Holotable and Metabase's Metabot use it. Without
+a local Ollama with no key. Holotable and Metabase's Metabot use it. marimo's
+editor and Rill have their own AI settings. Without
 a model, every stack still starts and every saved dashboard still loads.
 
 ## Seed data
@@ -302,9 +309,10 @@ agree.
 
 1. **Guide.** This README. Done.
 2. **Local lab.** Shared warehouse, seed data, live metrics, and stacks for
-   Superset, Metabase, Grafana, and Holotable, plus a WrenAI guide. Done.
-3. **More stacks.** Lightdash, Cube, Rill, Streamlit, marimo, and
-   OpenSearch Dashboards. Evidence is waiting on its new CLI: the
+   Superset, Metabase, Grafana, Rill, Holotable, Cube, Streamlit, and marimo,
+   plus a WrenAI guide. Done.
+3. **More stacks.** One more round of high-profile tools. Everything else
+   marked *TBD* waits on demand. Evidence is waiting on its new CLI: the
    `npm`-based workflow is deprecated, and the lab has not yet confirmed the
    new one runs with no account.
 4. **Comparison scripts.** One set of questions run against each tool, with

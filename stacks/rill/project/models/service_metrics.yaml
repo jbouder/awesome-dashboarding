@@ -1,0 +1,7 @@
+# The live service metrics. Refreshed every minute, so Rill's view of
+# "now" is never more than a minute old.
+type: model
+connector: warehouse
+refresh:
+  cron: "* * * * *"
+sql: SELECT ts, service, requests, errors, p95_latency_ms FROM ops.request_metrics

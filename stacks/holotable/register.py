@@ -1,10 +1,11 @@
-"""Register the lab warehouse as two Holotable sources.
+"""Register the lab warehouse in Holotable and build its dashboards.
 
   lab-metrics  the semantic views in schema metrics (business and service health)
   lab-ops      the raw live metrics in schema ops
 
-Holotable runs in local mode, so signing in is one request. Sources that
-already exist are left alone.
+Then three linked dashboards from dashboards.py. Holotable runs in local
+mode, so signing in is one request. Sources and dashboards that already
+exist, by id or title, are left alone.
 """
 
 from __future__ import annotations
@@ -14,7 +15,10 @@ import json
 import os
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
+
+import dashboards
 
 BASE = os.environ.get("HOLOTABLE_URL", "http://holotable:3000")
 WORKSPACE = "local"
@@ -116,7 +120,48 @@ def main() -> None:
         )
         print(f"[holotable-register] created source {src['id']} with {len(tables)} tables")
 
+    build_dashboards()
     print("[holotable-register] done")
+
+
+def find_dashboard(title: str) -> str | None:
+    q = urllib.parse.urlencode({"workspaceId": WORKSPACE, "search": title})
+    for d in call("GET", f"/api/dashboards?{q}").get("dashboards", []):
+        if d.get("title") == title:
+            return d["id"]
+    return None
+
+
+REBUILD = os.environ.get("HOLOTABLE_REBUILD") == "1"
+
+
+def save(spec: dict) -> str:
+    existing = find_dashboard(spec["title"])
+    if existing and REBUILD:
+        call("PUT", f"/api/dashboards/{existing}", {"spec": {"specVersion": 1, **spec}})
+        print(f"[holotable-register] rebuilt dashboard {spec['title']!r}")
+        return existing
+    if existing:
+        print(f"[holotable-register] dashboard {spec['title']!r} exists")
+        return existing
+    created = call("POST", "/api/dashboards", {"spec": {"specVersion": 1, **spec}})["dashboard"]
+    print(f"[holotable-register] created dashboard {spec['title']!r} with {len(spec['panels'])} panels")
+    return created["id"]
+
+
+def build_dashboards() -> None:
+    region_title = dashboards.TITLES["region"]
+    region_existed = find_dashboard(region_title) is not None
+    region_id = save(dashboards.region_spec())
+    service_id = save(dashboards.service_spec())
+    overview_id = save(dashboards.overview_spec(region_id, service_id))
+    if not region_existed or REBUILD:
+        # The region detail links back to the overview, which did not exist yet.
+        call(
+            "PUT",
+            f"/api/dashboards/{region_id}",
+            {"spec": {"specVersion": 1, **dashboards.region_spec(overview_id)}},
+        )
 
 
 if __name__ == "__main__":

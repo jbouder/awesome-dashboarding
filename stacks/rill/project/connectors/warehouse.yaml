@@ -1,0 +1,10 @@
+# The lab warehouse, as the read-only role. Rill copies what the models
+# select into its own DuckDB, so dashboards are fast and the warehouse is
+# only read when a model refreshes.
+type: connector
+driver: postgres
+host: warehouse
+port: "5432"
+user: lab_ro
+password: lab_ro
+dbname: lab

@@ -10,16 +10,24 @@ SQL API, and from Metabase's dashboard card must match to the cent.
 from __future__ import annotations
 
 import base64
+import hashlib
+import hmac
 import http.cookiejar
 import json
 import os
 import subprocess
 import sys
+import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PORTS = {
+    "cube": os.environ.get("CUBE_PORT", "4000"),
+    "rill": os.environ.get("RILL_PORT", "9009"),
+    "streamlit": os.environ.get("STREAMLIT_PORT", "3003"),
+    "marimo": os.environ.get("MARIMO_PORT", "3004"),
     "superset": os.environ.get("SUPERSET_PORT", "8088"),
     "grafana": os.environ.get("GRAFANA_PORT", "3001"),
     "holotable": os.environ.get("HOLOTABLE_PORT", "3000"),
@@ -69,6 +77,19 @@ class Client:
         with self.opener.open(req, data, timeout=30) as res:
             payload = res.read()
             return payload if raw else json.loads(payload or b"{}")
+
+
+def jwt(secret: str) -> str:
+    """A short-lived HS256 token for Cube's API."""
+
+    def b64(data: bytes) -> bytes:
+        return base64.urlsafe_b64encode(data).rstrip(b"=")
+
+    now = int(time.time())
+    head = b64(json.dumps({"alg": "HS256", "typ": "JWT"}).encode())
+    body = b64(json.dumps({"iat": now, "exp": now + 300}).encode())
+    sig = b64(hmac.new(secret.encode(), head + b"." + body, hashlib.sha256).digest())
+    return (head + b"." + body + b"." + sig).decode()
 
 
 def check(name: str):
@@ -200,6 +221,70 @@ def main() -> int:
                     f"source {source}",
                     "connects, read-only" if read_only else res.get("message", ""),
                 )
+            q = urllib.parse.urlencode({"workspaceId": "local", "search": "Lumen Supply"})
+            titles = {d["title"] for d in c.call("GET", f"/api/dashboards?{q}")["dashboards"]}
+            want = {
+                "Lumen Supply: executive overview",
+                "Lumen Supply: region detail",
+                "Lumen Supply: service health",
+            }
+            report(
+                "PASS" if want <= titles else "FAIL", "Lumen Supply dashboards", f"{len(want & titles)} of 3"
+            )
+
+    print("Cube")
+    if not running("cube"):
+        report("SKIP", "cube", "not running")
+    else:
+
+        @check("cube")
+        def _cube() -> None:
+            secret = os.environ.get("CUBE_API_SECRET", "dashlab-local-only-cube-secret-0123456789")
+            token = jwt(secret)
+            c = Client(f"http://localhost:{PORTS['cube']}")
+            c.headers["Authorization"] = token
+            query = json.dumps(
+                {
+                    "measures": ["sales.revenue"],
+                    "timeDimensions": [{"dimension": "sales.ordered_at", "dateRange": "last quarter"}],
+                }
+            )
+            rows = c.call("GET", "/cubejs-api/v1/load?" + urllib.parse.urlencode({"query": query}))["data"]
+            got = float(rows[0]["sales.revenue"])
+            # The views round each order to the cent; Cube sums unrounded lines.
+            close = abs(got - float(expected)) < 5
+            report(
+                "PASS" if close else "FAIL",
+                "revenue matches the warehouse",
+                f"${got:,.2f}, off by ${abs(got - float(expected)):.2f} from rounding",
+            )
+
+    print("Rill")
+    if not running("rill"):
+        report("SKIP", "rill", "not running")
+    else:
+
+        @check("rill")
+        def _rill() -> None:
+            c = Client(f"http://localhost:{PORTS['rill']}")
+            resources = c.call("GET", "/v1/instances/default/resources")["resources"]
+            errors = [r["meta"]["name"]["name"] for r in resources if r["meta"].get("reconcileError")]
+            report(
+                "PASS" if not errors else "FAIL",
+                "project loaded",
+                f"{len(resources)} resources" if not errors else f"errors in {', '.join(errors)}",
+            )
+
+    for name, path in (("streamlit", "/_stcore/health"), ("marimo", "/health")):
+        print(name.capitalize())
+        if not running(name):
+            report("SKIP", name, "not running")
+            continue
+
+        @check(name)
+        def _app(name: str = name, path: str = path) -> None:
+            Client(f"http://localhost:{PORTS[name]}").call("GET", path, raw=True)
+            report("PASS", "app serving")
 
     print()
     if failures:

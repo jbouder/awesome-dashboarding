@@ -9,3 +9,7 @@ include:
   - stacks/grafana/compose.yaml
   - stacks/holotable/compose.yaml
   - stacks/metabase/compose.yaml
+  - stacks/streamlit/compose.yaml
+  - stacks/marimo/compose.yaml
+  - stacks/cube/compose.yaml
+  - stacks/rill/compose.yaml

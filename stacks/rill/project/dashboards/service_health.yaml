@@ -1,0 +1,9 @@
+type: explore
+display_name: Service health
+metrics_view: service_metrics
+dimensions: "*"
+measures: "*"
+defaults:
+  time_range: PT6H
+  measures: [error_rate, requests, p95_latency_ms]
+  dimensions: [service]

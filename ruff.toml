@@ -1,0 +1,10 @@
+line-length = 110
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# Long SQL strings and descriptions read better unbroken.
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+# A marimo cell displays its last bare expression on purpose.
+"stacks/marimo/*.py" = ["B018"]

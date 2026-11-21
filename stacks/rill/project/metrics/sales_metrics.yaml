@@ -1,0 +1,38 @@
+version: 1
+type: metrics_view
+display_name: Lumen Supply sales
+description: Completed orders, net of discounts, by line.
+model: sales
+timeseries: ordered_at
+smallest_time_grain: day
+
+dimensions:
+  - column: region
+    display_name: Region
+  - column: channel
+    display_name: Channel
+  - column: segment
+    display_name: Segment
+  - column: category
+    display_name: Category
+  - column: product
+    display_name: Product
+
+measures:
+  - name: revenue
+    display_name: Revenue
+    expression: SUM(revenue)
+    description: Net revenue from completed orders.
+    format_preset: currency_usd
+  - name: orders
+    display_name: Orders
+    expression: COUNT(DISTINCT order_id)
+    format_preset: humanize
+  - name: units
+    display_name: Units
+    expression: SUM(units)
+    format_preset: humanize
+  - name: avg_order_value
+    display_name: Avg order value
+    expression: SUM(revenue) / COUNT(DISTINCT order_id)
+    format_preset: currency_usd

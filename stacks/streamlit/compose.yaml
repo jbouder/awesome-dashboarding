@@ -1,0 +1,20 @@
+# Streamlit: an AI-built data app, the kind an assistant writes in one go.
+# http://localhost:3003, no sign-in.
+services:
+  streamlit:
+    build: .
+    image: dashlab-streamlit:local
+    profiles: ["streamlit"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+    ports:
+      - "127.0.0.1:${STREAMLIT_PORT:-3003}:8501"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s

@@ -26,18 +26,70 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-STACKS="superset grafana holotable metabase"
+STACKS="superset metabase grafana rill holotable cube streamlit marimo"
 
 # Per stack: type, URL, sign-in, license, long-running services, one-shot jobs.
-stack_type()    { case $1 in superset) echo "Strategic, analytical";; grafana) echo "Operational";; holotable) echo "Generative";; metabase) echo "Strategic, analytical";; esac; }
-stack_url()     { case $1 in superset) echo "http://localhost:${SUPERSET_PORT:-8088}";; grafana) echo "http://localhost:${GRAFANA_PORT:-3001}";; holotable) echo "http://localhost:${HOLOTABLE_PORT:-3000}";; metabase) echo "http://localhost:${METABASE_PORT:-3002}";; esac; }
-stack_login()   { case $1 in superset) echo "admin / admin";; grafana) echo "none to view, admin / admin to edit";; holotable) echo "none (local owner)";; metabase) echo "admin@dashlab.local / dashlab-admin-1";; esac; }
-stack_license() { case $1 in superset) echo "Apache 2.0";; grafana) echo "AGPL-3.0";; holotable) echo "Apache 2.0";; metabase) echo "AGPL-3.0";; esac; }
-stack_services() { case $1 in superset) echo "superset superset-mcp";; grafana) echo "grafana";; holotable) echo "holotable";; metabase) echo "metabase";; esac; }
-stack_jobs()    { case $1 in superset) echo "superset-init superset-bootstrap";; grafana) echo "";; holotable) echo "holotable-register";; metabase) echo "metabase-bootstrap";; esac; }
+stack_type() {
+  case $1 in
+    superset|metabase) echo "Strategic, analytical";;
+    grafana) echo "Operational";;
+    rill) echo "Analytical, operational";;
+    holotable) echo "Generative";;
+    cube) echo "Semantic layer";;
+    streamlit|marimo) echo "AI-built app";;
+  esac
+}
+stack_url() {
+  case $1 in
+    superset) echo "http://localhost:${SUPERSET_PORT:-8088}";;
+    metabase) echo "http://localhost:${METABASE_PORT:-3002}";;
+    grafana) echo "http://localhost:${GRAFANA_PORT:-3001}";;
+    rill) echo "http://localhost:${RILL_PORT:-9009}";;
+    holotable) echo "http://localhost:${HOLOTABLE_PORT:-3000}";;
+    cube) echo "http://localhost:${CUBE_PORT:-4000}";;
+    streamlit) echo "http://localhost:${STREAMLIT_PORT:-3003}";;
+    marimo) echo "http://localhost:${MARIMO_PORT:-3004}";;
+  esac
+}
+stack_login() {
+  case $1 in
+    superset) echo "admin / admin";;
+    metabase) echo "admin@dashlab.local / dashlab-admin-1";;
+    grafana) echo "none to view, admin / admin to edit";;
+    holotable) echo "none (local owner)";;
+    cube) echo "none (dev mode)";;
+    *) echo "none";;
+  esac
+}
+stack_license() {
+  case $1 in
+    grafana|metabase) echo "AGPL-3.0";;
+    streamlit|holotable|cube|rill|marimo|superset) echo "Apache 2.0";;
+  esac
+}
+stack_services() {
+  case $1 in
+    superset) echo "superset superset-mcp";;
+    *) echo "$1";;
+  esac
+}
+stack_jobs() {
+  case $1 in
+    superset) echo "superset-init superset-bootstrap";;
+    holotable) echo "holotable-register";;
+    metabase) echo "metabase-bootstrap";;
+    *) echo "";;
+  esac
+}
 
 # Load .env so ports and passwords printed here match what Compose uses.
-if [ -f .env ]; then set -a; . ./.env; set +a; fi
+# As in Compose, a variable already set in the shell wins over .env.
+if [ -f .env ]; then
+  while IFS='=' read -r key value; do
+    case "$key" in ''|\#*|*[!A-Za-z0-9_]*) continue;; esac
+    [ -n "${!key+x}" ] || export "$key=$value"
+  done < .env
+fi
 
 say() { printf '\033[1m%s\033[0m\n' "$*"; }
 die() { printf 'Error: %s\n' "$*" >&2; exit 1; }
@@ -45,9 +97,9 @@ die() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 known() { case " $STACKS " in *" $1 "*) return 0;; *) return 1;; esac; }
 
 cmd_list() {
-  printf '%-10s %-22s %-24s %-11s %s\n' STACK TYPE URL LICENSE SIGN-IN
+  printf '%-10s %-24s %-24s %-11s %s\n' STACK TYPE URL LICENSE SIGN-IN
   for s in $STACKS; do
-    printf '%-10s %-22s %-24s %-11s %s\n' "$s" "$(stack_type "$s")" "$(stack_url "$s")" "$(stack_license "$s")" "$(stack_login "$s")"
+    printf '%-10s %-24s %-24s %-11s %s\n' "$s" "$(stack_type "$s")" "$(stack_url "$s")" "$(stack_license "$s")" "$(stack_login "$s")"
   done
   echo
   echo "Guide only, no container: wrenai (see stacks/wrenai/README.md)"
@@ -116,8 +168,13 @@ cmd_doctor() {
   for t in make curl python3; do
     if command -v "$t" >/dev/null; then echo "  PASS  $t"; else echo "  WARN  $t not found. make smoke and make open need it."; fi
   done
-  for s in $STACKS warehouse; do
-    if [ "$s" = warehouse ]; then port=${WAREHOUSE_PORT:-5433}; else port=$(stack_port "$s"); fi
+  for s in $STACKS warehouse superset-mcp cube-sql; do
+    case $s in
+      warehouse) port=${WAREHOUSE_PORT:-5433};;
+      superset-mcp) port=${SUPERSET_MCP_PORT:-5008};;
+      cube-sql) port=${CUBE_SQL_PORT:-15432};;
+      *) port=$(stack_port "$s");;
+    esac
     pid=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null | head -1 || true)
     if [ -z "$pid" ]; then echo "  PASS  port $port free ($s)"
     elif [ -n "$(docker compose --profile '*' ps -q 2>/dev/null)" ] && ps -p "$pid" -o comm= | grep -qi docker; then
@@ -139,12 +196,16 @@ cmd_pull() {
   local list
   [ $# -gt 0 ] || set -- all
   list=$(stacks_from "$@") || exit 1
-  local services="warehouse"
-  for s in $list; do profiles="$profiles --profile $s"; services="$services $(stack_services "$s")"; done
-  # Only registry images. The seed image, which stream and some setup jobs
-  # also use, is built locally.
+  local services="warehouse" builds="seed"
+  for s in $list; do
+    profiles="$profiles --profile $s"
+    case $s in
+      streamlit|marimo|rill) builds="$builds $s";;  # built locally
+      *) services="$services $(stack_services "$s")";;
+    esac
+  done
   docker compose $profiles pull $services
-  docker compose build seed
+  docker compose $profiles build $builds
 }
 
 cmd_stop() {
@@ -230,7 +291,7 @@ cmd_lint() {
   say "Shell scripts"; bash -n scripts/*.sh && echo "  ok" || failed=1
   if command -v shellcheck >/dev/null; then shellcheck scripts/*.sh || failed=1; else echo "  shellcheck not installed, skipped"; fi
   say "Python"
-  if command -v uvx >/dev/null; then uvx ruff check core stacks scripts --select E,F,W,I,B,UP --line-length 110 --ignore E501 && uvx ruff format --check --line-length 110 core stacks scripts || failed=1
+  if command -v uvx >/dev/null; then uvx ruff check core stacks scripts && uvx ruff format --check core stacks scripts || failed=1
   else echo "  uv not installed, skipped (install uv to run ruff)"; fi
   [ $failed = 0 ] || die "lint failed"
 }

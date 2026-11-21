@@ -1,0 +1,10 @@
+type: explore
+display_name: Lumen Supply sales
+metrics_view: sales_metrics
+dimensions: "*"
+measures: "*"
+defaults:
+  time_range: P12M
+  comparison_mode: time
+  measures: [revenue, orders, avg_order_value]
+  dimensions: [region, channel, segment]

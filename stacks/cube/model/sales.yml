@@ -1,0 +1,103 @@
+# Lumen Supply's semantic layer, defined in Cube on the raw `shop` tables.
+# The same definitions as the warehouse's `metrics` views (see
+# semantic/metrics.yml), written once here so any tool or agent that asks
+# Cube gets them.
+cubes:
+  - name: sales
+    title: Sales
+    description: One row per order line, with the order, customer, and product it belongs to.
+    sql: >
+      SELECT i.order_id || '-' || i.product_id AS line_id, o.order_id, o.ordered_at, o.status,
+             o.channel, o.region, c.segment, p.category, p.name AS product, i.quantity,
+             i.quantity * i.unit_price * (1 - i.discount) AS net_amount,
+             i.quantity * (i.unit_price * (1 - i.discount) - p.unit_cost) AS margin
+      FROM shop.order_items i
+      JOIN shop.orders o USING (order_id)
+      JOIN shop.customers c USING (customer_id)
+      JOIN shop.products p USING (product_id)
+
+    measures:
+      - name: revenue
+        description: Net revenue from completed orders. Refunded and canceled orders do not count.
+        sql: net_amount
+        type: sum
+        format: currency
+        filters:
+          - sql: "{CUBE}.status = 'completed'"
+
+      - name: gross_margin
+        description: Revenue minus product cost, completed orders only.
+        sql: margin
+        type: sum
+        format: currency
+        filters:
+          - sql: "{CUBE}.status = 'completed'"
+
+      - name: orders
+        description: Count of completed orders.
+        sql: order_id
+        type: count_distinct
+        filters:
+          - sql: "{CUBE}.status = 'completed'"
+
+      - name: units
+        sql: quantity
+        type: sum
+        filters:
+          - sql: "{CUBE}.status = 'completed'"
+
+      - name: avg_order_value
+        description: Revenue divided by orders.
+        sql: "{revenue} / NULLIF({orders}, 0)"
+        type: number
+        format: currency
+
+    dimensions:
+      - name: line_id
+        sql: line_id
+        type: string
+        primary_key: true
+        public: false
+      - name: ordered_at
+        sql: ordered_at
+        type: time
+      - name: status
+        sql: status
+        type: string
+      - name: channel
+        sql: channel
+        type: string
+      - name: region
+        sql: region
+        type: string
+      - name: segment
+        sql: segment
+        type: string
+      - name: category
+        sql: category
+        type: string
+      - name: product
+        sql: product
+        type: string
+
+  - name: targets
+    title: Targets
+    description: The monthly revenue plan per region.
+    sql_table: shop.targets
+    measures:
+      - name: revenue_target
+        sql: revenue_target
+        type: sum
+        format: currency
+    dimensions:
+      - name: key
+        sql: "{CUBE}.month || '-' || {CUBE}.region"
+        type: string
+        primary_key: true
+        public: false
+      - name: month
+        sql: month
+        type: time
+      - name: region
+        sql: region
+        type: string

@@ -34,8 +34,13 @@ services:
     image: dashlab-seed:local
     profiles: ["holotable"]
     command: ["python", "/lab/register.py"]
+    environment:
+      # 1 overwrites the lab's three dashboards with the specs in
+      # dashboards.py. Otherwise existing dashboards, and your edits, are kept.
+      HOLOTABLE_REBUILD: ${HOLOTABLE_REBUILD:-0}
     volumes:
       - ./register.py:/lab/register.py:ro
+      - ./dashboards.py:/lab/dashboards.py:ro
     depends_on:
       holotable:
         condition: service_healthy

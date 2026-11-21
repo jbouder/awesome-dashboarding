@@ -1,0 +1,25 @@
+version: 1
+type: metrics_view
+display_name: Service health
+description: Live request metrics per service, refreshed every minute.
+model: service_metrics
+timeseries: ts
+smallest_time_grain: minute
+
+dimensions:
+  - column: service
+    display_name: Service
+
+measures:
+  - name: requests
+    display_name: Requests
+    expression: SUM(requests)
+    format_preset: humanize
+  - name: error_rate
+    display_name: Error rate
+    expression: SUM(errors) / NULLIF(SUM(requests), 0)
+    format_preset: percentage
+  - name: p95_latency_ms
+    display_name: Worst p95 latency (ms)
+    expression: MAX(p95_latency_ms)
+    format_preset: humanize

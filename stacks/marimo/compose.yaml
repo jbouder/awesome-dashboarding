@@ -1,0 +1,21 @@
+# marimo: a reactive Python notebook that runs as an app.
+# http://localhost:3004, no sign-in.
+services:
+  marimo:
+    build: .
+    image: dashlab-marimo:local
+    profiles: ["marimo"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+      MARIMO_MODE: ${MARIMO_MODE:-run}
+    ports:
+      - "127.0.0.1:${MARIMO_PORT:-3004}:2718"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:2718/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
