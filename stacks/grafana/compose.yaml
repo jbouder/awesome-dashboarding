@@ -31,5 +31,31 @@ services:
       timeout: 3s
       retries: 40
 
+  # Grafana's MCP server, for agents. http://localhost:5010/mcp
+  grafana-mcp:
+    image: grafana/mcp-grafana:2.3.0-alpine
+    profiles: ["grafana"]
+    command:
+      - -t
+      - streamable-http
+      - --address
+      - 0.0.0.0:8000
+      - --allowed-hosts
+      - localhost:${GRAFANA_MCP_PORT:-5010},127.0.0.1:${GRAFANA_MCP_PORT:-5010},localhost:8000
+    environment:
+      GRAFANA_URL: http://grafana:3000
+      GRAFANA_USERNAME: admin
+      GRAFANA_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    ports:
+      - "127.0.0.1:${GRAFANA_MCP_PORT:-5010}:8000"
+    depends_on:
+      grafana:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8000/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
 volumes:
   grafana:

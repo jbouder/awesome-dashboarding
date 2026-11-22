@@ -10,10 +10,12 @@ x-superset: &superset
     SUPERSET_METADATA_URL: postgresql+psycopg2://lab:${WAREHOUSE_PASSWORD:-lab}@warehouse:5432/superset
     SUPERSET_ADMIN_USERNAME: admin
     SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-admin}
+    SUPERSET_GUEST_TOKEN_SECRET: ${SUPERSET_GUEST_TOKEN_SECRET:-dashlab-local-only-guest-token-secret}
   volumes:
     - ./superset_config.py:/app/pythonpath/superset_config.py:ro
     - ./init.sh:/app/lab/init.sh:ro
     - ./bootstrap.py:/app/lab/bootstrap.py:ro
+    - ./security.py:/app/lab/security.py:ro
 
 services:
   superset-init:
@@ -48,6 +50,14 @@ services:
       superset:
         condition: service_healthy
       seed:
+        condition: service_completed_successfully
+
+  # Roles, the EMEA-only user, and row-level security, for the Part 2 demo.
+  superset-security:
+    <<: *superset
+    command: ["python", "/app/lab/security.py"]
+    depends_on:
+      superset-bootstrap:
         condition: service_completed_successfully
 
   # Superset's MCP server, for agents. http://localhost:5008/mcp

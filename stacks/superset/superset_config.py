@@ -16,7 +16,20 @@ FEATURE_FLAGS = {
     "DRILL_TO_DETAIL": True,
     "DRILL_BY": True,
     "DASHBOARD_RBAC": False,
+    "EMBEDDED_SUPERSET": True,
 }
+
+# --- Embedding (examples/part-2/superset-embed) ------------------------------
+# Guests get the lab's read-only viewer role, plus whatever row-level
+# security clause the guest token carries. Local lab only: the frame and CSP
+# protections are off so a page on another localhost port can embed Superset.
+GUEST_ROLE_NAME = "Lab viewer"
+GUEST_TOKEN_JWT_SECRET = os.environ.get(
+    "SUPERSET_GUEST_TOKEN_SECRET", "dashlab-local-only-guest-token-secret"
+)
+GUEST_TOKEN_JWT_EXP_SECONDS = 3600
+TALISMAN_ENABLED = False
+HTTP_HEADERS: dict = {}
 
 # Local lab only: no CSRF on the REST API so the bootstrap script stays short.
 WTF_CSRF_ENABLED = False

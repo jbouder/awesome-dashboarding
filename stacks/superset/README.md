@@ -20,6 +20,10 @@ make up superset
     channel per quarter, revenue by category, average order value, and top
     products.
 - Superset's MCP server at <http://localhost:5008/mcp>.
+- For Part 2: a `Lab viewer` role, an `EMEA only` row-level security rule,
+  and a user `emea` / `emea-viewer-1` who sees EMEA only
+  (`security.py`). Embedding is on, for
+  `examples/part-2/superset-embed`.
 
 ## Tour
 

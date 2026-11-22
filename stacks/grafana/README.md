@@ -20,6 +20,9 @@ hand:
   every 5 seconds from `ops.request_metrics`, plus recent incidents.
 - `provisioning/alerting/`: **High error rate**, which fires for any service
   whose error rate over the last minute is above 5%.
+- Grafana's MCP server, [mcp-grafana](https://github.com/grafana/mcp-grafana),
+  at <http://localhost:5010/mcp>, signed in as the Grafana admin, for
+  agents. Keep it local.
 
 ## Tour
 

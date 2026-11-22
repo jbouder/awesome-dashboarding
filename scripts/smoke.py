@@ -209,6 +209,10 @@ def main() -> int:
             report("PASS", "dashboard Service health", f"{len(dash['panels'])} panels")
             rule = c.call("GET", "/api/v1/provisioning/alert-rules/lab-high-error-rate")
             report("PASS" if rule.get("title") == "High error rate" else "FAIL", "alert rule High error rate")
+            if running("grafana-mcp"):
+                port = os.environ.get("GRAFANA_MCP_PORT", "5010")
+                Client(f"http://localhost:{port}").call("GET", "/healthz", raw=True)
+                report("PASS", "MCP server")
 
     print("Holotable")
     if not running("holotable"):

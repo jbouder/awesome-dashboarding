@@ -1,0 +1,278 @@
+{
+  "specVersion": 1,
+  "title": "Lumen Supply: executive overview",
+  "timeRange": {
+    "from": "now-730d",
+    "to": "now"
+  },
+  "refreshIntervalMs": 60000,
+  "panels": [
+    {
+      "id": "about",
+      "title": "About this dashboard",
+      "viz": "text",
+      "options": {
+        "content": "## Are we on track?\n\nLumen Supply's revenue against plan. Revenue is completed orders net of discounts, in USD. **Click a region** in the attainment bars, the map of revenue, or the table to open its detail. The question to answer: which region missed its target last quarter, and why?"
+      },
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 2
+      }
+    },
+    {
+      "id": "revenue",
+      "title": "Revenue, last full quarter (USD)",
+      "viz": "stat",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT sum(revenue) AS revenue FROM monthly_kpis WHERE month >= (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) - interval '3 months' AND month < (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis)"
+      },
+      "options": {
+        "decimals": 2,
+        "compact": true
+      },
+      "format": "number",
+      "layout": {
+        "x": 0,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      }
+    },
+    {
+      "id": "attainment",
+      "title": "Attainment, last full quarter",
+      "viz": "stat",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT 100.0 * sum(revenue) / sum(revenue_target) AS attainment FROM monthly_kpis WHERE month >= (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) - interval '3 months' AND month < (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis)"
+      },
+      "options": {
+        "decimals": 1,
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "danger"
+          },
+          {
+            "value": 92,
+            "color": "warning"
+          },
+          {
+            "value": 98,
+            "color": "success"
+          }
+        ]
+      },
+      "format": "percent",
+      "layout": {
+        "x": 3,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      }
+    },
+    {
+      "id": "orders",
+      "title": "Orders, last full quarter",
+      "viz": "stat",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT sum(orders) AS orders FROM monthly_kpis WHERE month >= (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) - interval '3 months' AND month < (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis)"
+      },
+      "options": {
+        "compact": true
+      },
+      "format": "number",
+      "layout": {
+        "x": 6,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      }
+    },
+    {
+      "id": "customers",
+      "title": "Active customers by month",
+      "viz": "stat",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT month, sum(active_customers) AS customers FROM monthly_kpis GROUP BY month ORDER BY month",
+        "timeField": "month"
+      },
+      "options": {
+        "compact": true,
+        "sparkline": true
+      },
+      "format": "number",
+      "layout": {
+        "x": 9,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      }
+    },
+    {
+      "id": "by-region",
+      "title": "Attainment by region, last full quarter",
+      "description": "Click a region to open its detail.",
+      "viz": "gauge",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT region, 100.0 * sum(revenue) / sum(revenue_target) AS attainment FROM monthly_kpis WHERE month >= (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) - interval '3 months' AND month < (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) GROUP BY region ORDER BY attainment"
+      },
+      "options": {
+        "variant": "bar",
+        "min": 80,
+        "max": 110,
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "danger"
+          },
+          {
+            "value": 92,
+            "color": "warning"
+          },
+          {
+            "value": 98,
+            "color": "success"
+          }
+        ],
+        "decimals": 1
+      },
+      "format": "percent",
+      "layout": {
+        "x": 0,
+        "y": 5,
+        "w": 5,
+        "h": 4
+      }
+    },
+    {
+      "id": "vs-target",
+      "title": "Revenue vs. target by month (USD)",
+      "description": "Full months only. The current month is left out until it ends.",
+      "viz": "line",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT to_char(month, 'Mon YYYY') AS month, sum(revenue) AS revenue, sum(revenue_target) AS target FROM monthly_kpis WHERE month < (SELECT max(month) FROM monthly_kpis) GROUP BY monthly_kpis.month ORDER BY monthly_kpis.month"
+      },
+      "options": {
+        "compact": true,
+        "legend": "top"
+      },
+      "format": "number",
+      "layout": {
+        "x": 5,
+        "y": 5,
+        "w": 7,
+        "h": 4
+      }
+    },
+    {
+      "id": "mix",
+      "title": "Last quarter's revenue by region and channel",
+      "description": "Each region's share, split by channel. Click a region to open its detail.",
+      "viz": "treemap",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT region, channel, sum(revenue) AS revenue FROM daily_revenue WHERE order_date >= (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) - interval '3 months' AND order_date < (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) GROUP BY region, channel"
+      },
+      "options": {
+        "path": [
+          "region",
+          "channel"
+        ],
+        "value": "revenue",
+        "compact": true
+      },
+      "format": "number",
+      "layout": {
+        "x": 0,
+        "y": 9,
+        "w": 6,
+        "h": 5
+      }
+    },
+    {
+      "id": "regions",
+      "title": "Regions, last full quarter",
+      "description": "Each row links to the region's detail.",
+      "viz": "table",
+      "query": {
+        "sourceId": "lab-metrics",
+        "sql": "SELECT region, sum(revenue) AS revenue, sum(revenue_target) AS target, 100.0 * sum(revenue) / sum(revenue_target) AS attainment, sum(orders) AS orders FROM monthly_kpis WHERE month >= (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) - interval '3 months' AND month < (SELECT date_trunc('quarter', max(month)) FROM monthly_kpis) GROUP BY region ORDER BY attainment"
+      },
+      "options": {
+        "columns": [
+          {
+            "name": "region",
+            "label": "Region"
+          },
+          {
+            "name": "revenue",
+            "label": "Revenue (USD)",
+            "decimals": 2,
+            "compact": true,
+            "align": "right"
+          },
+          {
+            "name": "target",
+            "label": "Target (USD)",
+            "decimals": 2,
+            "compact": true,
+            "align": "right"
+          },
+          {
+            "name": "attainment",
+            "label": "Attainment",
+            "format": "percent",
+            "decimals": 1,
+            "align": "right"
+          },
+          {
+            "name": "orders",
+            "label": "Orders",
+            "compact": true,
+            "align": "right"
+          }
+        ]
+      },
+      "layout": {
+        "x": 6,
+        "y": 9,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "id": "ops",
+      "title": "Store error rate, last hour",
+      "description": "From the live service metrics. Open the service health dashboard from this panel's menu.",
+      "viz": "line",
+      "query": {
+        "sourceId": "lab-ops",
+        "sql": "SELECT time_bucket('1 minute', ts) AS minute, 100.0 * sum(errors) / nullif(sum(requests), 0) AS error_pct FROM request_metrics GROUP BY minute ORDER BY minute",
+        "timeField": "minute"
+      },
+      "options": {
+        "decimals": 1,
+        "legend": "none"
+      },
+      "format": "percent",
+      "timeRange": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "layout": {
+        "x": 6,
+        "y": 12,
+        "w": 6,
+        "h": 2
+      }
+    }
+  ]
+}

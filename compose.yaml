@@ -19,3 +19,4 @@ include:
   - stacks/lightdash/compose.yaml
   - examples/_shared/compose.static.yaml
   - examples/03-streamlit/compose.yaml
+  - examples/part-2/superset-embed/compose.yaml

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumen Supply partner portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@superset-ui/embedded-sdk@0.4.0/bundle/index.js"></script>
+<style>
+:root{--bg:#f6f7f9;--surface:#fff;--border:#dde1e8;--text:#1b1f27;--text-muted:#5a6170;--accent:#2563eb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif}
+header{background:#111827;color:#f9fafb;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+header b{font-size:18px}
+header span{color:#9ca3af;margin-left:8px}
+label{color:#d1d5db;margin-right:8px}
+select{font:inherit;padding:6px 10px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#f9fafb}
+.note{max-width:1280px;margin:16px auto 0;padding:0 16px;color:var(--text-muted)}
+#dashboard{max-width:1280px;margin:12px auto 32px;padding:0 16px;height:calc(100vh - 150px);min-height:640px}
+#dashboard iframe{width:100%;height:100%;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+</style>
+</head>
+<body>
+<header>
+  <div><b>Lumen Supply</b><span>Partner portal</span></div>
+  <div>
+    <label for="region">Signed in as a partner in</label>
+    <select id="region">
+      <option value="">All regions (internal view)</option>
+      <option>EMEA</option><option>North America</option><option>APAC</option><option>LATAM</option>
+    </select>
+  </div>
+</header>
+<p class="note" id="note">This page embeds Superset's Executive KPIs dashboard. Pick a region: Superset filters every chart
+  with row-level security carried in the guest token. The browser never holds Superset credentials.</p>
+<div id="dashboard"></div>
+<script>
+const mount = document.getElementById("dashboard");
+async function show(region) {
+  mount.innerHTML = "";
+  const first = await fetch(`/guest-token?region=${encodeURIComponent(region)}`).then(r => r.json());
+  if (!first.token) { mount.textContent = first.error || "Could not get a guest token."; return; }
+  await supersetEmbeddedSdk.embedDashboard({
+    id: first.uuid,
+    supersetDomain: "http://localhost:8088",
+    mountPoint: mount,
+    fetchGuestToken: async () => first.token || (await fetch(`/guest-token?region=${encodeURIComponent(region)}`).then(r => r.json())).token,
+    dashboardUiConfig: { hideTitle: false, filters: { expanded: false } },
+  });
+  first.token = null;  // refreshes ask the server again
+}
+document.getElementById("region").addEventListener("change", e => show(e.target.value));
+show("");
+</script>
+</body>
+</html>

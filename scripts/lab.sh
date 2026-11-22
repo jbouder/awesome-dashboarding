@@ -83,6 +83,7 @@ stack_services() {
   case $1 in
     superset) echo "superset superset-mcp";;
     clickhouse) echo "clickhouse clickhouse-mcp";;
+    grafana) echo "grafana grafana-mcp";;
     opensearch) echo "opensearch-dashboards opensearch opensearch-logs";;
     lightdash) echo "lightdash lightdash-db lightdash-minio";;
     *) echo "$1";;
@@ -90,7 +91,7 @@ stack_services() {
 }
 stack_jobs() {
   case $1 in
-    superset) echo "superset-init superset-bootstrap";;
+    superset) echo "superset-init superset-bootstrap superset-security";;
     holotable) echo "holotable-register";;
     metabase) echo "metabase-bootstrap";;
     opensearch) echo "opensearch-bootstrap";;

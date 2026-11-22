@@ -1,0 +1,18 @@
+# make example superset-embed: a partner portal that embeds Superset with
+# row-level security from guest tokens. http://localhost:3121
+# Needs the superset stack; make example starts it.
+services:
+  ex-superset-embed:
+    build: .
+    image: dashlab-ex-superset-embed:local
+    profiles: ["ex-superset-embed"]
+    environment:
+      SUPERSET_URL: http://superset:8088
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD:-admin}
+    ports:
+      - "127.0.0.1:3121:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
