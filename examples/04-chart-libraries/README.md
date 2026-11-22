@@ -2,7 +2,8 @@
 
 **Supports:** Part 1, "Pick libraries models can write reliably". **Needs:**
 a browser. `make example static` serves it at
-<http://localhost:3102/04-chart-libraries/>, and GitHub Pages publishes it.
+<http://localhost:3102/04-chart-libraries/>, and GitHub Pages publishes it:
+<https://jbouder.github.io/dashboarding-lab/04-chart-libraries/>.
 
 The same chart, EMEA revenue by channel for the last four full quarters, in
 each library on the slide: Vega-Lite, Apache ECharts, Recharts (what shadcn

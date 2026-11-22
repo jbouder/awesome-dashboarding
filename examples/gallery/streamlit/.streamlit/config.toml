@@ -1,0 +1,45 @@
+# Lumen Supply theme, from examples/_shared/design-tokens.css.
+# Defining both light and dark lets viewers pick either in Settings.
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+font = "sans-serif"
+baseRadius = "10px"
+
+[theme.light]
+primaryColor = "#2563eb"
+backgroundColor = "#f6f7f9"
+secondaryBackgroundColor = "#eef0f4"
+textColor = "#1b1f27"
+borderColor = "#dde1e8"
+linkColor = "#2563eb"
+blueColor = "#2563eb"
+redColor = "#c2410c"
+orangeColor = "#b45309"
+greenColor = "#15803d"
+redBackgroundColor = "#ffedd5"
+orangeBackgroundColor = "#fef3c7"
+greenBackgroundColor = "#dcfce7"
+grayColor = "#5a6170"
+chartCategoricalColors = ["#2563eb", "#f08c2e", "#0f9d8a", "#8b5cf6", "#64748b"]
+
+[theme.dark]
+primaryColor = "#60a5fa"
+backgroundColor = "#0e1116"
+secondaryBackgroundColor = "#1f2630"
+textColor = "#e6e9ef"
+borderColor = "#2b3340"
+linkColor = "#60a5fa"
+blueColor = "#60a5fa"
+redColor = "#fb923c"
+orangeColor = "#fbbf24"
+greenColor = "#4ade80"
+redBackgroundColor = "#3b1f0e"
+orangeBackgroundColor = "#3a2c0c"
+greenBackgroundColor = "#12301f"
+grayColor = "#9aa3b2"
+chartCategoricalColors = ["#60a5fa", "#fbae5c", "#34d3b8", "#b197fc", "#94a3b8"]

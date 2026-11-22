@@ -1,0 +1,17 @@
+# make example observable: the Observable Framework gallery build. http://localhost:3116
+services:
+  ex-observable:
+    build: ./app
+    image: dashlab-ex-observable:local
+    profiles: ["ex-observable"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+      OBSERVABLE_TELEMETRY_DISABLE: "true"
+    ports:
+      - "127.0.0.1:3116:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s

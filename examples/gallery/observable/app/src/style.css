@@ -1,0 +1,86 @@
+/* Framework's light and dark themes, then the lab's design tokens on top. */
+@import url("observablehq:default.css");
+@import url("observablehq:theme-air.css") (prefers-color-scheme: light);
+@import url("observablehq:theme-near-midnight.css") (prefers-color-scheme: dark);
+@import url("./tokens.css");
+
+:root {
+  --theme-foreground-focus: var(--accent);
+}
+
+#observablehq-main {
+  max-width: 1200px;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-6);
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.report {
+  font-size: var(--text-md);
+  max-width: 72ch;
+}
+
+.kpi-label {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.kpi-value {
+  font-size: var(--text-kpi);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.kpi-note {
+  font-size: var(--text-sm);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.band-danger { color: var(--danger); }
+.band-warning { color: var(--warning); }
+.band-success { color: var(--success); }
+.badge.band-danger { background: var(--danger-bg); }
+.badge.band-warning { background: var(--warning-bg); }
+.badge.band-success { background: var(--success-bg); }
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.filters form {
+  width: auto;
+}
+
+.empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.clickable svg [aria-label^="bar"] {
+  cursor: pointer;
+}

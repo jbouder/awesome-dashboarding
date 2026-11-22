@@ -26,6 +26,7 @@ side by side.
 - [Coverage by type](#coverage-by-type)
 - [Patterns that hold across all four types](#patterns-that-hold-across-all-four-types)
 - [Run them locally](#run-them-locally)
+- [Examples](#examples)
 - [Seed data](#seed-data)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -290,6 +291,28 @@ a local Ollama with no key. Holotable and Metabase's Metabot use it. marimo's
 editor and Rill have their own AI settings. Without
 a model, every stack still starts and every saved dashboard still loads.
 
+## Examples
+
+[`examples/`](examples/) has everything for the two "Dashboarding in the Age
+of AI" talks, and the same dashboard built in seven frameworks. Every example
+has the full prompt that builds it, a short demo prompt to type live, a
+reference build to fall back on, and notes on what to point out.
+
+- **Part 1, ad hoc dashboarding with AI:** a Claude artifact from a CSV, the
+  same dashboard as one HTML file, a Streamlit app from Claude Code, one
+  chart in six libraries, and four definitions of revenue. Run of show:
+  [`examples/part-1/RUNBOOK.md`](examples/part-1/RUNBOOK.md).
+- **Gallery:** the Lumen Supply dashboard in Panel, Plotly Dash, Shiny for
+  Python, marimo, Streamlit, Observable Framework, and Gradio. `make
+  examples` lists them.
+- **Part 2, dashboard platforms:** Superset with row-level security and
+  embedding, Grafana with alerting and an MCP server, Holotable, the same
+  question asked of every AI, and the patterns. Run of show:
+  [`examples/part-2/RUNBOOK.md`](examples/part-2/RUNBOOK.md).
+
+The static examples are published at
+<https://jbouder.github.io/dashboarding-lab/>.
+
 ## Seed data
 
 Every stack reads the same synthetic dataset from one warehouse. It is
@@ -320,13 +343,13 @@ agree.
 ## Roadmap
 
 1. **Guide.** This README. Done.
-2. **Local lab.** Shared warehouse, seed data, live metrics, and stacks for
-   Superset, Metabase, Grafana, Rill, Holotable, Cube, Streamlit, and marimo,
-   plus a WrenAI guide. Done.
-3. **High-profile stacks.** Lightdash, Evidence, ClickHouse, and OpenSearch
-   Dashboards. Done. Everything still marked *TBD* waits on demand.
-4. **Comparison scripts.** One set of questions run against each tool, with
-   the answers collected side by side.
+2. **Local lab.** Shared warehouse, seed data, live metrics, and twelve
+   stacks, plus a WrenAI guide. Done.
+3. **Examples.** Both talks, with prompts and runbooks, and the same
+   dashboard in seven frameworks. Done. See [`examples/`](examples/).
+4. **Next.** The tools still marked *TBD*, when there is demand, and
+   recorded answers for `examples/part-2/ai-answers` once a model is
+   chosen for the talks.
 
 ## Contributing
 

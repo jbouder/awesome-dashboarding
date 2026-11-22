@@ -13,7 +13,7 @@ Python you now own.
 | File | What it is |
 | --- | --- |
 | `prompts.md` | The demo prompt, the follow-up, and the build prompt |
-| `app/app.py` | The reference build, after the follow-up. About 90 lines |
+| `app/app.py` | The reference build, after the follow-up. About 100 lines |
 | `app/Dockerfile`, `compose.yaml` | How `make example streamlit-demo` runs it |
 
 The full Streamlit dashboard, built to the shared spec, is in
@@ -33,7 +33,7 @@ prompt produces.
 - **Minutes, not days.** A working app from one prompt.
 - **It used the semantic layer** because the prompt pointed at it. Its
   numbers match Superset and Holotable.
-- **The code is yours.** About 90 lines, readable. That is the upside, full
+- **The code is yours.** About 100 lines, readable. That is the upside, full
   control and no license, and the downside: someone has to host it, secure
   it, and keep it correct.
 - **marimo is the alternative** for a reactive notebook. See

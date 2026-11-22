@@ -1,0 +1,94 @@
+/*
+ * Lumen Supply design tokens, shared by every example.
+ * Light by default; dark follows the system, or [data-theme="dark"].
+ * Series colors are a blue/orange-led palette that stays apart in
+ * lightness, so they read in grayscale and for common color blindness.
+ */
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 28px;
+  --text-kpi: 32px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius: 10px;
+
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --border: #dde1e8;
+  --text: #1b1f27;
+  --text-muted: #5a6170;
+
+  --accent: #2563eb;
+  --series-1: #2563eb; /* revenue, web */
+  --series-2: #f08c2e; /* target, mobile */
+  --series-3: #0f9d8a; /* partner */
+  --series-4: #8b5cf6;
+  --series-5: #64748b;
+
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #c2410c;
+  --success-bg: #dcfce7;
+  --warning-bg: #fef3c7;
+  --danger-bg: #ffedd5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1116;
+    --surface: #161b22;
+    --surface-2: #1f2630;
+    --border: #2b3340;
+    --text: #e6e9ef;
+    --text-muted: #9aa3b2;
+    --accent: #60a5fa;
+    --series-1: #60a5fa;
+    --series-2: #fbae5c;
+    --series-3: #34d3b8;
+    --series-4: #b197fc;
+    --series-5: #94a3b8;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #fb923c;
+    --success-bg: #12301f;
+    --warning-bg: #3a2c0c;
+    --danger-bg: #3b1f0e;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e1116;
+  --surface: #161b22;
+  --surface-2: #1f2630;
+  --border: #2b3340;
+  --text: #e6e9ef;
+  --text-muted: #9aa3b2;
+  --accent: #60a5fa;
+  --series-1: #60a5fa;
+  --series-2: #fbae5c;
+  --series-3: #34d3b8;
+  --series-4: #b197fc;
+  --series-5: #94a3b8;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #fb923c;
+  --success-bg: #12301f;
+  --warning-bg: #3a2c0c;
+  --danger-bg: #3b1f0e;
+}
+
+/* Hex values for tools that cannot read CSS variables (Python, Vega). */
+/* light: series #2563eb #f08c2e #0f9d8a #8b5cf6 #64748b, text #1b1f27, muted #5a6170, border #dde1e8 */
+/* dark:  series #60a5fa #fbae5c #34d3b8 #b197fc #94a3b8, text #e6e9ef, muted #9aa3b2, border #2b3340 */

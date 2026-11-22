@@ -4,7 +4,8 @@ Examples for both talks in the "Dashboarding in the Age of AI" series, and
 a gallery of framework examples built to one shared dashboard spec. Every
 example comes with the prompts that build it and a short prompt to run live.
 
-Status: planned. Decisions made November 22, 2026.
+Status: built, November 22, 2026. Everything below is in `examples/`. The one open item:
+`examples/part-2/ai-answers` needs answers recorded with a model at rehearsal.
 
 ## Decisions
 

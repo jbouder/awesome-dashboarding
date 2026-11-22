@@ -40,5 +40,5 @@ warehouse. Dates are relative to today, so refresh before a talk.
 
 ## Fallback
 
-Open `result.html`, or the published copy on GitHub Pages (see the
-repository README). It is the dashboard the build prompt asks for.
+Open `result.html`, or the published copy at
+<https://jbouder.github.io/dashboarding-lab/02-static-html/>. It is the dashboard the build prompt asks for.

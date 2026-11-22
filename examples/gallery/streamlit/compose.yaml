@@ -1,0 +1,18 @@
+# make example streamlit: the Lumen Supply dashboard in Streamlit.
+# http://localhost:3115
+services:
+  ex-streamlit:
+    build: .
+    image: dashlab-ex-streamlit:local
+    profiles: ["ex-streamlit"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+      STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+    ports:
+      - "127.0.0.1:3115:8501"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s

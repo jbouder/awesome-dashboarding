@@ -1,0 +1,17 @@
+{
+  "name": "lumen-supply-observable",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "observable build",
+    "dev": "observable preview",
+    "serve": "node serve.js"
+  },
+  "dependencies": {
+    "@observablehq/framework": "1.13.4",
+    "pg": "8.23.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

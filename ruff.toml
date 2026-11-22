@@ -7,4 +7,4 @@ ignore = ["E501"]
 
 [lint.per-file-ignores]
 # A marimo cell displays its last bare expression on purpose.
-"stacks/marimo/*.py" = ["B018"]
+"**/marimo/*.py" = ["B018"]

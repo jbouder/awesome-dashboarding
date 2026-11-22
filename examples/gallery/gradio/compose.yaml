@@ -1,0 +1,17 @@
+# make example gradio: the Lumen Supply dashboard in Gradio. http://localhost:3117
+services:
+  ex-gradio:
+    build: ./app
+    image: dashlab-ex-gradio:local
+    profiles: ["ex-gradio"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+      GRADIO_ANALYTICS_ENABLED: "False"
+    ports:
+      - "127.0.0.1:3117:7860"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7860/')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s

@@ -51,11 +51,19 @@ bars = (
     alt.Chart(regions)
     .mark_bar()
     .encode(
-        x=alt.X("attainment:Q", title="Revenue ÷ target", axis=alt.Axis(format="%"),
-                scale=alt.Scale(domain=[0.8, 1.1], clamp=True)),
+        x=alt.X(
+            "attainment:Q",
+            title="Revenue ÷ target",
+            axis=alt.Axis(format="%"),
+            scale=alt.Scale(domain=[0.8, 1.1], clamp=True),
+        ),
         y=alt.Y("region:N", sort="x", title=None, axis=alt.Axis(labelLimit=200)),
         color=alt.condition(alt.datum.attainment < 0.98, alt.value("#c2410c"), alt.value("#2563eb")),
-        tooltip=["region", alt.Tooltip("attainment:Q", format=".1%"), alt.Tooltip("revenue:Q", format="$,.0f")],
+        tooltip=[
+            "region",
+            alt.Tooltip("attainment:Q", format=".1%"),
+            alt.Tooltip("revenue:Q", format="$,.0f"),
+        ],
     )
 )
 target = alt.Chart(pd.DataFrame({"x": [1.0]})).mark_rule(strokeDash=[4, 4]).encode(x="x:Q")
@@ -77,10 +85,14 @@ st.altair_chart(
     .encode(
         x=alt.X("quarter:O", title=None, axis=alt.Axis(labelAngle=0)),
         y=alt.Y("revenue:Q", title="Revenue (USD)", axis=alt.Axis(format="$~s")),
-        color=alt.Color("channel:N", scale=alt.Scale(domain=["web", "mobile", "partner"],
-                                                     range=["#2563eb", "#f08c2e", "#0f9d8a"])),
+        color=alt.Color(
+            "channel:N",
+            scale=alt.Scale(domain=["web", "mobile", "partner"], range=["#2563eb", "#f08c2e", "#0f9d8a"]),
+        ),
         tooltip=["quarter", "channel", alt.Tooltip("revenue:Q", format="$,.0f")],
     ),
     width="stretch",
 )
-st.caption("Revenue is completed orders net of discounts, from the warehouse's semantic layer (schema metrics).")
+st.caption(
+    "Revenue is completed orders net of discounts, from the warehouse's semantic layer (schema metrics)."
+)

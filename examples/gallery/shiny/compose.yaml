@@ -1,0 +1,16 @@
+# make example shiny: the Lumen Supply dashboard in Shiny for Python. http://localhost:3113
+services:
+  ex-shiny:
+    build: ./app
+    image: dashlab-ex-shiny:local
+    profiles: ["ex-shiny"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+    ports:
+      - "127.0.0.1:3113:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s

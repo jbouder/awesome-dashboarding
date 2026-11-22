@@ -20,3 +20,10 @@ include:
   - examples/_shared/compose.static.yaml
   - examples/03-streamlit/compose.yaml
   - examples/part-2/superset-embed/compose.yaml
+  - examples/gallery/marimo/compose.yaml
+  - examples/gallery/streamlit/compose.yaml
+  - examples/gallery/observable/compose.yaml
+  - examples/gallery/panel/compose.yaml
+  - examples/gallery/dash/compose.yaml
+  - examples/gallery/shiny/compose.yaml
+  - examples/gallery/gradio/compose.yaml

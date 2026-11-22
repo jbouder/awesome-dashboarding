@@ -6,7 +6,8 @@
 The Demo 1 dashboard as one self-contained HTML file: styles, data, and
 charts in a single file you own. Open it from disk, or put it on any static
 host. This folder is published to GitHub Pages by
-`.github/workflows/pages.yml`.
+`.github/workflows/pages.yml`:
+<https://jbouder.github.io/dashboarding-lab/02-static-html/>.
 
 ## Files
 

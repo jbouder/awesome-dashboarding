@@ -1,0 +1,16 @@
+# make example panel: the Lumen Supply dashboard in Panel. http://localhost:3111
+services:
+  ex-panel:
+    build: .
+    image: dashlab-ex-panel:local
+    profiles: ["ex-panel"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+    ports:
+      - "127.0.0.1:3111:5006"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5006/liveness')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s

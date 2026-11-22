@@ -1,0 +1,143 @@
+/* Copied from examples/_shared/design-tokens.css so the image is self-contained. */
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 28px;
+  --text-kpi: 32px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius: 10px;
+
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --border: #dde1e8;
+  --text: #1b1f27;
+  --text-muted: #5a6170;
+
+  --accent: #2563eb;
+  --series-1: #2563eb; /* revenue, web */
+  --series-2: #f08c2e; /* target, mobile */
+  --series-3: #0f9d8a; /* partner */
+  --series-4: #8b5cf6;
+  --series-5: #64748b;
+
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #c2410c;
+  --success-bg: #dcfce7;
+  --warning-bg: #fef3c7;
+  --danger-bg: #ffedd5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1116;
+    --surface: #161b22;
+    --surface-2: #1f2630;
+    --border: #2b3340;
+    --text: #e6e9ef;
+    --text-muted: #9aa3b2;
+    --accent: #60a5fa;
+    --series-1: #60a5fa;
+    --series-2: #fbae5c;
+    --series-3: #34d3b8;
+    --series-4: #b197fc;
+    --series-5: #94a3b8;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #fb923c;
+    --success-bg: #12301f;
+    --warning-bg: #3a2c0c;
+    --danger-bg: #3b1f0e;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e1116;
+  --surface: #161b22;
+  --surface-2: #1f2630;
+  --border: #2b3340;
+  --text: #e6e9ef;
+  --text-muted: #9aa3b2;
+  --accent: #60a5fa;
+  --series-1: #60a5fa;
+  --series-2: #fbae5c;
+  --series-3: #34d3b8;
+  --series-4: #b197fc;
+  --series-5: #94a3b8;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #fb923c;
+  --success-bg: #12301f;
+  --warning-bg: #3a2c0c;
+  --danger-bg: #3b1f0e;
+}
+
+
+/* Dash 4 component colors follow the tokens. */
+:root {
+  --Dash-Fill-Inverse-Strong: var(--surface);
+  --Dash-Text-Strong: var(--text);
+  --Dash-Text-Weak: var(--text-muted);
+  --Dash-Stroke-Strong: var(--border);
+  --Dash-Fill-Interactive-Strong: var(--accent);
+  --Dash-Fill-Interactive-Weak: var(--surface-2);
+}
+
+/* Layout */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: var(--text-md); }
+.page { max-width: 1400px; margin: 0 auto; padding: var(--space-6) var(--space-4); }
+.header { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-4); }
+.header h1 { margin: 0; font-size: var(--text-xl); }
+.muted { color: var(--text-muted); font-size: var(--text-sm); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); }
+.card h2 { font-size: var(--text-lg); margin: 0 0 var(--space-2); }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-4); }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-3) var(--space-4); }
+.kpi .label { color: var(--text-muted); font-size: var(--text-sm); }
+.kpi .value { font-size: var(--text-kpi); font-weight: 600; line-height: 1.2; }
+.kpi .delta { color: var(--text-muted); font-size: var(--text-sm); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: var(--text-xs); font-weight: 600; }
+.band-danger { color: var(--danger); } .badge.band-danger { background: var(--danger-bg); }
+.band-warning { color: var(--warning); } .badge.band-warning { background: var(--warning-bg); }
+.band-success { color: var(--success); } .badge.band-success { background: var(--success-bg); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.filters { display: flex; gap: var(--space-3); align-items: flex-end; flex-wrap: wrap; }
+.filters .field { width: 200px; }
+.filters label, .field label { display: block; font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-1); }
+button.btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; font: inherit; font-size: var(--text-sm); cursor: pointer; }
+button.btn:disabled { opacity: 0.45; cursor: default; }
+button.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+input.search { width: 260px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
+.empty { padding: var(--space-6); text-align: center; color: var(--text-muted); }
+.signature { border: 2px solid var(--accent); }
+.tag { display: inline-block; font-size: var(--text-xs); font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+.crumbs { display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; margin: var(--space-2) 0; }
+.crumbs button { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: var(--text-sm); cursor: pointer; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: var(--space-4); }
+.modal { background: var(--surface); color: var(--text); border-radius: var(--radius); border: 1px solid var(--border); width: min(1000px, 100%); max-height: 90vh; overflow: auto; padding: var(--space-4); }
+.modal-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); }
+.modal-head h2 { margin: 0; font-size: var(--text-lg); }
+
+/* DataTable follows the theme. */
+.dash-spreadsheet-container .dash-spreadsheet-inner th { background: var(--surface-2) !important; color: var(--text) !important; }
+.dash-spreadsheet-container .dash-spreadsheet-inner td { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
+.dash-table-container .previous-next-container, .dash-table-container .page-number { color: var(--text); }
+.dash-table-container .previous-next-container button { color: var(--text); background: transparent; }
+
+@media (max-width: 1000px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+}

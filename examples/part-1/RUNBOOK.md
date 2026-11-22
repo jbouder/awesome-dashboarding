@@ -83,7 +83,8 @@ collapsed. Claude chose its own revenue definition; note it for later.
    ```
 
 2. Download it and open it from disk.
-3. Show the published copy on GitHub Pages.
+3. Show the published copy:
+   <https://jbouder.github.io/dashboarding-lab/02-static-html/>.
 
 **Point out:** you own it, hosting is free, the data is a snapshot, and
 anyone with the file sees all of it.
