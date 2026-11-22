@@ -1,7 +1,8 @@
-# Awesome Open Source Dashboarding
+# Dashboarding Lab
 
-A field guide to open source dashboarding in the age of AI, plus a lab to run
-each tool on your own machine.
+A hands-on lab for open source dashboarding in the age of AI: a field guide
+to the open source tools, and one command to run each of them on your own
+machine.
 
 Building a dashboard used to take weeks. Now it can take a prompt. This repo
 sorts the open source landscape into four dashboard types, says what each
