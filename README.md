@@ -214,8 +214,8 @@ start downloads every image, about 40 GB on disk, which takes a while.
 `make up all` is ready in about two and a half minutes, most of it Lightdash.
 
 ```sh
-git clone https://github.com/jbouder/awesome-dashboarding.git
-cd awesome-dashboarding
+git clone https://github.com/jbouder/dashboarding-lab.git
+cd dashboarding-lab
 make doctor                # check Docker, memory, ports, and tools
 make up all                # start every stack, seed data loaded
 make smoke                 # check every stack works and agrees on the numbers
