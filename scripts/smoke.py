@@ -383,6 +383,36 @@ def main() -> int:
             Client(f"http://localhost:{PORTS[name]}").call("GET", path, raw=True)
             report("PASS", "app serving")
 
+    # Examples: only the ones running are checked. (port, path, text the page must contain)
+    examples = {
+        "ex-static": (3102, "/02-static-html/", '"period":"Q'),
+        "ex-streamlit-demo": (3101, "/_stcore/health", "ok"),
+        "ex-panel": (3111, "/", "Lumen Supply"),
+        "ex-dash": (3112, "/", "Lumen Supply"),
+        "ex-shiny": (3113, "/", "Lumen Supply"),
+        "ex-marimo": (3114, "/health", ""),
+        "ex-streamlit": (3115, "/_stcore/health", "ok"),
+        "ex-observable": (3116, "/", "Lumen Supply"),
+        "ex-gradio": (3117, "/", "Lumen Supply"),
+        "ex-superset-embed": (3121, "/", "Lumen Supply"),
+    }
+    live = [name for name in examples if running(name)]
+    print("Examples")
+    if not live:
+        report("SKIP", "examples", "none running")
+    for name in live:
+        port, path, needle = examples[name]
+
+        @check(name)
+        def _example(name: str = name, port: int = port, path: str = path, needle: str = needle) -> None:
+            body = Client(f"http://localhost:{port}").call("GET", path, raw=True).decode(errors="replace")
+            ok = needle in body
+            report(
+                "PASS" if ok else "FAIL",
+                name.removeprefix("ex-"),
+                "serving" if ok else f"page is missing {needle!r}",
+            )
+
     print()
     if failures:
         print(f"{failures} check(s) failed.")

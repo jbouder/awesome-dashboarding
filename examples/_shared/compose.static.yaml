@@ -1,0 +1,15 @@
+# make example static: serves examples/ over HTTP, as GitHub Pages will.
+# http://localhost:3102
+services:
+  ex-static:
+    image: nginx:1.30.7-alpine
+    profiles: ["ex-static"]
+    ports:
+      - "127.0.0.1:3102:80"
+    volumes:
+      - ..:/usr/share/nginx/html:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/_shared/design-tokens.css"]
+      interval: 3s
+      timeout: 3s
+      retries: 20

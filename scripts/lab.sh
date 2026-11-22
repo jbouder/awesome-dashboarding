@@ -21,6 +21,9 @@
 #   scripts/lab.sh reset                    stop everything and delete all data
 #   scripts/lab.sh reseed                   regenerate the seed data
 #   scripts/lab.sh lint                     lint the lab's own scripts and Compose files
+#   scripts/lab.sh extract                  write the example CSVs and snapshot
+#   scripts/lab.sh examples                 every runnable example and its URL
+#   scripts/lab.sh example <name>...        start examples (see examples/README.md)
 #
 # Written for the bash 3.2 that ships with macOS.
 set -euo pipefail
@@ -313,6 +316,57 @@ cmd_lint() {
   [ $failed = 0 ] || die "lint failed"
 }
 
+# --- Examples ----------------------------------------------------------------
+# Each runnable example is a Compose profile ex-<name>, with services named
+# ex-<name> or ex-<name>-<part>. See examples/README.md.
+EXAMPLES="static streamlit-demo panel dash shiny marimo streamlit observable gradio superset-embed"
+example_url() {
+  case $1 in
+    static) echo "http://localhost:3102";;
+    streamlit-demo) echo "http://localhost:3101";;
+    panel) echo "http://localhost:3111";;
+    dash) echo "http://localhost:3112";;
+    shiny) echo "http://localhost:3113";;
+    marimo) echo "http://localhost:3114";;
+    streamlit) echo "http://localhost:3115";;
+    observable) echo "http://localhost:3116";;
+    gradio) echo "http://localhost:3117";;
+    superset-embed) echo "http://localhost:3121";;
+  esac
+}
+example_needs() { case $1 in superset-embed) echo "superset";; *) echo "";; esac; }
+
+cmd_examples() {
+  printf '%-16s %s\n' EXAMPLE URL
+  for e in $EXAMPLES; do printf '%-16s %s\n' "$e" "$(example_url "$e")"; done
+  echo; echo "Start one with: make example <name>. Static pages also open from disk."
+}
+
+cmd_example() {
+  [ $# -gt 0 ] || die "name at least one example, such as: make example dash. Run make examples for the list."
+  local e profiles="" services="" needs=""
+  for e in "$@"; do
+    case " $EXAMPLES " in *" $e "*) ;; *) die "unknown example '$e'. Run make examples for the list.";; esac
+    profiles="$profiles --profile ex-$e"
+    services="$services $(docker compose --profile "ex-$e" config --services | grep -E "^ex-$e(-|$)" | tr '\n' ' ')"
+    needs="$needs $(example_needs "$e")"
+  done
+  if [ -n "${needs// /}" ]; then cmd_up $needs; fi
+  say "Starting examples: $*"
+  docker compose $profiles up -d --build --wait $services
+  echo
+  for e in "$@"; do printf '  %-16s %s\n' "$e" "$(example_url "$e")"; done
+}
+
+cmd_extract() {
+  docker compose up -d --wait warehouse >/dev/null
+  docker compose build -q seed
+  docker compose run --rm --no-deps \
+    -e EXAMPLES_DIR=/examples \
+    -v "$PWD/examples:/examples" -v "$PWD/scripts/extract.py:/app/extract.py:ro" \
+    seed python extract.py
+}
+
 cmd_down()   { docker compose --profile '*' down; }
 cmd_reset()  { docker compose --profile '*' down --volumes; say "All lab data deleted."; }
 cmd_ps()     { docker compose --profile '*' ps; }
@@ -329,7 +383,7 @@ cmd_logs() {
   docker compose --profile "$1" logs -f $(stack_services "$1") $(stack_jobs "$1")
 }
 
-cmd_help() { sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; }
+cmd_help() { sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'; }
 
 command="${1:-help}"
 shift || true
@@ -354,6 +408,9 @@ case "$command" in
   reset) cmd_reset ;;
   reseed) cmd_reseed ;;
   lint) cmd_lint ;;
+  extract) cmd_extract ;;
+  examples) cmd_examples ;;
+  example) cmd_example "$@" ;;
   help|-h|--help) cmd_help ;;
   *) die "unknown command '$command'. Run: scripts/lab.sh help" ;;
 esac

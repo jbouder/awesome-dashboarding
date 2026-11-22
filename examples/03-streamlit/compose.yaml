@@ -1,0 +1,19 @@
+# make example streamlit-demo: the Part 1 Demo 3 app. http://localhost:3101
+services:
+  ex-streamlit-demo:
+    build: ./app
+    image: dashlab-ex-streamlit-demo:local
+    profiles: ["ex-streamlit-demo"]
+    environment:
+      WAREHOUSE_URL: postgresql://lab_ro:lab_ro@warehouse:5432/lab
+    ports:
+      - "127.0.0.1:3101:8501"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s

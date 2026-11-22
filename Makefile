@@ -27,23 +27,28 @@
 #   make reset                stop everything and delete all data
 #   make reseed               regenerate the seed data
 #   make lint                 lint the lab's own scripts and Compose files
+#
+# Examples
+#   make examples             every runnable example and its URL
+#   make example dash panel   start examples
+#   make extract              write the example CSVs and snapshot
 
 LAB := ./scripts/lab.sh
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 
 # Commands whose following words are arguments, not targets.
-ARG_COMMANDS := up stop restart open pull incident logs
+ARG_COMMANDS := up stop restart open pull incident logs example
 
 .PHONY: help doctor env pull list up stop restart status open smoke story \
-	psql sql incident logs ps down reset reseed lint
+	psql sql incident logs ps down reset reseed lint extract examples example
 
 help:
-	@sed -n '3,29p' Makefile | sed 's/^# \{0,1\}//'
+	@sed -n '3,34p' Makefile | sed 's/^# \{0,1\}//'
 
-doctor env list status smoke story psql ps down reset reseed lint:
+doctor env list status smoke story psql ps down reset reseed lint extract examples:
 	@$(LAB) $@
 
-up stop restart open pull incident logs:
+up stop restart open pull incident logs example:
 	@$(LAB) $@ $(ARGS)
 
 sql:

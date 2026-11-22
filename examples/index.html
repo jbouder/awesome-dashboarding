@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboarding Lab examples</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--surface:#fff;--border:#dde1e8;--text:#1b1f27;--text-muted:#5a6170;--accent:#2563eb}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1116;--surface:#161b22;--border:#2b3340;--text:#e6e9ef;--text-muted:#9aa3b2;--accent:#60a5fa}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 16px}
+h1{font-size:30px;margin:0 0 6px}
+p{color:var(--text-muted);margin:0 0 24px}
+a{color:var(--accent)}
+.list{display:grid;gap:12px}
+.item{display:block;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-decoration:none;color:var(--text)}
+.item:hover{border-color:var(--accent)}
+.item b{display:block;font-size:17px;margin-bottom:2px}
+.item span{color:var(--text-muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Dashboarding Lab examples</h1>
+  <p>The static examples from the "Dashboarding in the Age of AI" talks. All data is synthetic, from the lab's
+    made-up retailer, Lumen Supply. Source, prompts, and the runnable examples are in the
+    <a href="https://github.com/jbouder/dashboarding-lab/tree/main/examples">dashboarding-lab repository</a>.</p>
+  <div class="list">
+    <a class="item" href="02-static-html/"><b>Lumen Supply dashboard</b><span>Part 1, Demos 1 and 2: an AI-built dashboard as one self-contained HTML file.</span></a>
+    <a class="item" href="04-chart-libraries/"><b>One chart, six libraries</b><span>Part 1: the same chart in Vega-Lite, ECharts, Recharts, Plotly, D3, and uPlot, with the code for each.</span></a>
+  </div>
+</div>
+</body>
+</html>

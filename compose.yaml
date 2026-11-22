@@ -17,3 +17,5 @@ include:
   - stacks/opensearch/compose.yaml
   - stacks/evidence/compose.yaml
   - stacks/lightdash/compose.yaml
+  - examples/_shared/compose.static.yaml
+  - examples/03-streamlit/compose.yaml
