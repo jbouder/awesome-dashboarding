@@ -238,21 +238,26 @@ Run `make help` for every command. The ones you will use most:
 | `make down` | Stop everything and keep the data |
 | `make reset` | Stop everything and delete all data |
 
-| Stack | Type | URL | Sign-in | Tour |
-| --- | --- | --- | --- | --- |
-| Superset | Strategic, analytical | <http://localhost:8088> | `admin` / `admin` | [stacks/superset](stacks/superset/) |
-| Metabase | Strategic, analytical | <http://localhost:3002> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/metabase](stacks/metabase/) |
-| Lightdash | Analytical | <http://localhost:8080> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/lightdash](stacks/lightdash/) |
-| Evidence | Strategic | <http://localhost:3005> | `lab` / `lab` | [stacks/evidence](stacks/evidence/) |
-| Grafana | Operational | <http://localhost:3001> | None to view, `admin` / `admin` to edit | [stacks/grafana](stacks/grafana/) |
-| ClickHouse | Operational engine | <http://localhost:8123/play> | `lab` / `lab` | [stacks/clickhouse](stacks/clickhouse/) |
-| OpenSearch Dashboards | Operational, logs | <http://localhost:5601> | None | [stacks/opensearch](stacks/opensearch/) |
-| Rill | Analytical, operational | <http://localhost:9009> | None | [stacks/rill](stacks/rill/) |
-| Holotable | Generative | <http://localhost:3000> | None | [stacks/holotable](stacks/holotable/) |
-| Cube | Semantic layer | <http://localhost:4000> | None | [stacks/cube](stacks/cube/) |
-| Streamlit | AI-built app | <http://localhost:3003> | None | [stacks/streamlit](stacks/streamlit/) |
-| marimo | AI-built app | <http://localhost:3004> | None | [stacks/marimo](stacks/marimo/) |
-| WrenAI | Generative | Your own agent | | [stacks/wrenai](stacks/wrenai/) |
+| Stack | Start | Type | URL | Sign-in | Tour |
+| --- | --- | --- | --- | --- | --- |
+| Superset | `make up superset` | Strategic, analytical | <http://localhost:8088> | `admin` / `admin` | [stacks/superset](stacks/superset/) |
+| Metabase | `make up metabase` | Strategic, analytical | <http://localhost:3002> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/metabase](stacks/metabase/) |
+| Lightdash | `make up lightdash` | Analytical | <http://localhost:8080> | `admin@dashlab.local` / `dashlab-admin-1` | [stacks/lightdash](stacks/lightdash/) |
+| Evidence | `make up evidence` | Strategic | <http://localhost:3005> | `lab` / `lab` | [stacks/evidence](stacks/evidence/) |
+| Grafana | `make up grafana` | Operational | <http://localhost:3001> | None to view, `admin` / `admin` to edit | [stacks/grafana](stacks/grafana/) |
+| ClickHouse | `make up clickhouse` | Operational engine | <http://localhost:8123/play> | `lab` / `lab` | [stacks/clickhouse](stacks/clickhouse/) |
+| OpenSearch Dashboards | `make up opensearch` | Operational, logs | <http://localhost:5601> | None | [stacks/opensearch](stacks/opensearch/) |
+| Rill | `make up rill` | Analytical, operational | <http://localhost:9009> | None | [stacks/rill](stacks/rill/) |
+| Holotable | `make up holotable` | Generative | <http://localhost:3000> | None | [stacks/holotable](stacks/holotable/) |
+| Cube | `make up cube` | Semantic layer | <http://localhost:4000> | None | [stacks/cube](stacks/cube/) |
+| Streamlit | `make up streamlit` | AI-built app | <http://localhost:3003> | None | [stacks/streamlit](stacks/streamlit/) |
+| marimo | `make up marimo` | AI-built app | <http://localhost:3004> | None | [stacks/marimo](stacks/marimo/) |
+| WrenAI | Any stack, then your agent | Generative | Your own agent | | [stacks/wrenai](stacks/wrenai/) |
+
+Combine stacks in one command, such as `make up superset grafana`, or start
+every one with `make up all`. `make up clickhouse grafana` also gives
+Grafana a ClickHouse dashboard. Set `LLM_*` in `.env` first to turn on the
+AI features in Holotable and Metabase.
 
 These are local test passwords. Every port is bound to `127.0.0.1`, so
 nothing is reachable from your network. Do not reuse them elsewhere.
